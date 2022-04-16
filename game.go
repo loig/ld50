@@ -28,3 +28,8 @@ func initGame() *Game {
 	g.hud = initHud()
 	return &g
 }
+
+func (g *Game) NextLevel() {
+	g.hud.NextLevel()
+	g.level = initLevel(15, 10)
+}

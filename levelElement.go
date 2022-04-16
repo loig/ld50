@@ -43,7 +43,7 @@ func (e levelElement) Draw(screen *ebiten.Image) {
 		var c color.Color
 		switch e.elementType {
 		case persoType:
-			c = color.RGBA{255, 0, 0, 255}
+			c = color.RGBA{255, 0, 255, 255}
 		case cactusType:
 			c = color.RGBA{0, 255, 0, 255}
 		case snakeType:
@@ -51,9 +51,9 @@ func (e levelElement) Draw(screen *ebiten.Image) {
 		case scorpionType:
 			c = color.RGBA{255, 255, 0, 255}
 		case waterType:
-			c = color.RGBA{255, 0, 255, 255}
-		case foodType:
 			c = color.RGBA{0, 255, 255, 255}
+		case foodType:
+			c = color.RGBA{255, 0, 0, 255}
 		}
 		ebitenutil.DrawRect(
 			screen,
@@ -63,4 +63,12 @@ func (e levelElement) Draw(screen *ebiten.Image) {
 			c,
 		)
 	}
+}
+
+func (e levelElement) IsMovable() bool {
+	return e.elementType == persoType || e.elementType == snakeType || e.elementType == scorpionType
+}
+
+func (e levelElement) IsCollectible() bool {
+	return e.elementType == waterType || e.elementType == foodType
 }

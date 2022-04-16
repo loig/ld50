@@ -24,9 +24,11 @@ import (
 )
 
 type level struct {
-	area     [][]*levelElement
-	movable  []*levelElement
-	selected int
+	area         [][]*levelElement
+	movable      []*levelElement
+	perso        *levelElement
+	goalX, goalY int
+	selected     int
 }
 
 func initLevel(sizeX, sizeY int) (l level) {
@@ -34,12 +36,19 @@ func initLevel(sizeX, sizeY int) (l level) {
 	for i := 0; i < sizeY; i++ {
 		l.area[i] = make([]*levelElement, sizeX)
 	}
-	l.area[0][0] = &levelElement{elementType: persoType, posX: 0, posY: 0}
-	l.area[2][1] = &levelElement{elementType: cactusType, posX: 1, posY: 2}
-	l.area[3][2] = &levelElement{elementType: snakeType, posX: 2, posY: 3}
-	l.area[4][3] = &levelElement{elementType: scorpionType, posX: 3, posY: 4}
-	l.area[5][4] = &levelElement{elementType: waterType, posX: 4, posY: 5}
-	l.area[6][5] = &levelElement{elementType: foodType, posX: 5, posY: 6}
+
+	persoX := sizeX / 2
+	persoY := sizeY - 1
+	l.perso = &levelElement{elementType: persoType, posX: persoX, posY: persoY}
+	l.area[persoY][persoX] = l.perso
+
+	l.goalX = persoX
+	l.goalY = 0
+
+	// gen level
+	// nothing on goal, nothing on perso
+	l.GenArea()
+	// end gen level
 
 	l.movable = make([]*levelElement, 0)
 	var selectedPos int
@@ -49,18 +58,18 @@ func initLevel(sizeX, sizeY int) (l level) {
 				if l.area[i][j].elementType == persoType {
 					l.selected = selectedPos
 				}
-				switch l.area[i][j].elementType {
-				case persoType, snakeType, scorpionType:
+				if l.area[i][j].IsMovable() {
 					l.movable = append(l.movable, l.area[i][j])
 					selectedPos++
 				}
 			}
 		}
 	}
+
 	return
 }
 
-func (l *level) Update() (hurt bool) {
+func (l *level) Update() (hurt, food, water, finished bool) {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
 		l.ChangeSelected()
@@ -68,14 +77,16 @@ func (l *level) Update() (hurt bool) {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		hurt = l.MoveSelected(globMoveLeft)
+		hurt, food, water = l.MoveSelected(globMoveLeft)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		hurt = l.MoveSelected(globMoveRight)
+		hurt, food, water = l.MoveSelected(globMoveRight)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		hurt = l.MoveSelected(globMoveUp)
+		hurt, food, water = l.MoveSelected(globMoveUp)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		hurt = l.MoveSelected(globMoveDown)
+		hurt, food, water = l.MoveSelected(globMoveDown)
 	}
+
+	finished = l.perso.posX == l.goalX && l.perso.posY == l.goalY
 
 	return
 }
@@ -84,7 +95,7 @@ func (l *level) ChangeSelected() {
 	l.selected = (l.selected + 1) % len(l.movable)
 }
 
-func (l *level) MoveSelected(direction int) (hurt bool) {
+func (l *level) MoveSelected(direction int) (hurt, food, water bool) {
 	var moveX, moveY int
 	switch direction {
 	case globMoveUp:
@@ -111,6 +122,15 @@ func (l *level) MoveSelected(direction int) (hurt bool) {
 			hurt =
 				(toMove.elementType == persoType && l.area[i][j].elementType == scorpionType) ||
 					(toMove.elementType == snakeType && l.area[i][j].elementType == persoType)
+			if l.area[i][j].IsCollectible() {
+				if toMove.elementType == persoType {
+					food = l.area[i][j].elementType == foodType
+					water = l.area[i][j].elementType == waterType
+				}
+				l.area[i][j] = nil
+				i += moveY
+				j += moveX
+			}
 			break
 		}
 
@@ -135,6 +155,8 @@ func (l level) Draw(screen *ebiten.Image) {
 
 	l.DrawBackground(screen)
 
+	l.DrawGoal(screen)
+
 	for _, line := range l.area {
 		for _, element := range line {
 			if element != nil {
@@ -154,6 +176,17 @@ func (l level) DrawBackground(screen *ebiten.Image) {
 		float64(globAreaCellSize*len(l.area[0])),
 		float64(globAreaCellSize*len(l.area)),
 		color.RGBA{55, 55, 55, 255},
+	)
+}
+
+func (l level) DrawGoal(screen *ebiten.Image) {
+	ebitenutil.DrawRect(
+		screen,
+		float64(l.goalX*globAreaCellSize+globAreaPositionX),
+		float64(l.goalY*globAreaCellSize+globAreaPositionY),
+		float64(globAreaCellSize),
+		float64(globAreaCellSize),
+		color.RGBA{155, 55, 55, 255},
 	)
 }
 

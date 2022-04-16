@@ -16,25 +16,6 @@
 */
 package main
 
-const (
-	globScreenWidth    = 800
-	globScreenHeight   = 600
-	globTitle          = "ld50"
-	globAreaPositionX  = 0
-	globAreaPositionY  = 0
-	globAreaCellSize   = 20
-	globMoveLeft       = 0
-	globMoveUp         = 1
-	globMoveRight      = 2
-	globMoveDown       = 3
-	globLifePositionX  = 0
-	globLifePositionY  = 300
-	globLifeSize       = 30
-	globLifeSep        = 10
-	globWaterPositionX = 0
-	globWaterPositionY = 400
-	globWaterWidth     = 250
-	globWaterHeight    = 10
-	globWaterSep       = 10
-	globWaterDrink     = 25
-)
+func (l *level) GenArea() {
+
+}

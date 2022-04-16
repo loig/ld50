@@ -23,27 +23,87 @@ import (
 )
 
 type hud struct {
-	life int
+	life      int
+	lifeMax   int
+	water     int
+	waterStep int
+	waterMax  int
+	levelNum  int
 }
 
 func initHud() (h hud) {
-	h.life = 3
+	h.lifeMax = 3
+	h.life = h.lifeMax
+	h.waterMax = 1000
+	h.water = h.waterMax
+	h.waterStep = 1
+	h.levelNum = 1
 	return
 }
 
-func (h *hud) ReduceLife() {
-	h.life--
+func (h *hud) NextLevel() {
+	h.levelNum++
+	h.water = h.waterMax
+}
+
+func (h *hud) Update(hurt, food, water bool) (dead bool) {
+	if hurt {
+		h.life--
+		if h.life < 0 {
+			h.life = 0
+		}
+	}
+	if food {
+		h.life++
+		if h.life > h.lifeMax {
+			h.life = h.lifeMax
+		}
+	}
+
+	h.water -= h.waterStep
+	if h.water < 0 {
+		h.water = 0
+	}
+	if water {
+		h.water += globWaterDrink * h.waterMax / 100
+		if h.water > h.waterMax {
+			h.water = h.waterMax
+		}
+	}
+
+	dead = h.life <= 0 || h.water <= 0
+
+	return
 }
 
 func (h hud) Draw(screen *ebiten.Image) {
+
+	h.DrawLife(screen)
+
+	h.DrawWater(screen)
+
+}
+
+func (h hud) DrawLife(screen *ebiten.Image) {
 	for i := 0; i < h.life; i++ {
 		ebitenutil.DrawRect(
 			screen,
-			float64(globHudLifeSep/2+i*(globHudLifeSize+globHudLifeSep)+globHudPositionX),
-			float64(globHudPositionY),
-			float64(globHudLifeSize),
-			float64(globHudLifeSize),
+			float64(i*(globLifeSize+globLifeSep)+globLifePositionX),
+			float64(globLifePositionY),
+			float64(globLifeSize),
+			float64(globLifeSize),
 			color.RGBA{255, 0, 0, 255},
 		)
 	}
+}
+
+func (h hud) DrawWater(screen *ebiten.Image) {
+	ebitenutil.DrawRect(
+		screen,
+		float64(globWaterPositionX),
+		float64(globWaterPositionY),
+		float64(globWaterWidth*h.water/h.waterMax),
+		float64(globWaterHeight),
+		color.RGBA{0, 255, 255, 255},
+	)
 }
