@@ -40,4 +40,6 @@ const (
 	globNumSteps       = 8
 	globLevelX         = 15
 	globLevelY         = 12
+	globXDivider       = 3
+	globYDivider       = 2
 )

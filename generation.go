@@ -50,7 +50,7 @@ func (l *level) GenArea() {
 
 	// gen a sequence of left/right positions according to the number of steps
 	// positions are not coordinates, they represent sets of x coordinates
-	possibleXPos := make([]int, len(l.area[0])/3-1) // need to be parameterized
+	possibleXPos := make([]int, len(l.area[0])/globXDivider-1) // need to be parameterized
 	for i := 0; i < len(possibleXPos); i++ {
 		if i < len(possibleXPos)/2 {
 			possibleXPos[i] = i
@@ -71,7 +71,7 @@ func (l *level) GenArea() {
 
 	// gen a sequence of up/down coordinates according to the number of steps
 	// positions are not coordinates, they represent sets of y coordinates
-	possibleYPos := make([]int, len(l.area)/2-2) // need to be parameterized
+	possibleYPos := make([]int, len(l.area)/globYDivider-2) // need to be parameterized
 	for i := 0; i < len(possibleYPos); i++ {
 		possibleYPos[i] = i + 1
 	}
@@ -105,11 +105,95 @@ func (l *level) GenArea() {
 		}
 	}
 
+	// if the second last position is below the second one, do a symmetry
+	if xyseq[1].lr == xyseq[len(xyseq)-2].lr && xyseq[1].ud < xyseq[len(xyseq)-2].ud {
+		for i := 1; i < (len(xyseq)+1)/2; i++ {
+			xyseq[i].ud, xyseq[len(xyseq)-i-1].ud = xyseq[len(xyseq)-i-1].ud, xyseq[i].ud
+		}
+	}
+
 	log.Print("everything: ", xyseq)
 
 	// from positions, get coordinates
+	xshift := rand.Intn(globXDivider)
+	lastx := -1
+	lasty := -1
+	yshift := rand.Intn(globYDivider)
+	for i := 0; i < len(xyseq); i++ {
+		x := xyseq[i].lr
+		if x == lastx {
+			xyseq[i].lr = xyseq[i-1].lr
+		} else {
+			lastx = x
+			if x == (len(l.area[0])/globXDivider-1)/2 {
+				x = len(l.area[0]) / 2
+				xshift = rand.Intn(globXDivider)
+			} else {
+				x = x*globXDivider + xshift
+				if xshift == globXDivider-1 {
+					xshift = rand.Intn(globXDivider-1) + 1
+				} else {
+					xshift = rand.Intn(globXDivider)
+				}
+			}
+			xyseq[i].lr = x
+		}
 
-	// put obstacles according to the position sequence and the step sequence
+		y := xyseq[i].ud
+		if y == lasty {
+			xyseq[i].ud = xyseq[i-1].ud
+		} else {
+			lasty = y
+			if y == yseq[0] {
+				y = len(l.area) - 1
+			} else if y != 0 {
+				y = y*globYDivider + yshift
+				if yshift == globYDivider-1 {
+					yshift = rand.Intn(globYDivider-1) + 1
+				} else {
+					yshift = rand.Intn(globYDivider)
+				}
+			}
+			xyseq[i].ud = y
+		}
+	}
+
+	log.Print("real coordinates: ", xyseq)
+
+	// put cactus according to the position sequence and the step sequence
+	for i := 1; i < len(xyseq); i++ {
+		xmod := 0
+		xdiff := xyseq[i].lr - xyseq[i-1].lr
+		if xdiff > 0 {
+			xmod = 1
+		} else if xdiff < 0 {
+			xmod = -1
+		}
+
+		ymod := 0
+		ydiff := xyseq[i].ud - xyseq[i-1].ud
+		if ydiff > 0 {
+			ymod = 1
+		} else if ydiff < 0 {
+			ymod = -1
+		}
+
+		l.area[xyseq[i].ud][xyseq[i].lr] = &levelElement{
+			elementType: foodType,
+			posX:        xyseq[i].lr,
+			posY:        xyseq[i].ud,
+		}
+
+		x := xyseq[i].lr + xmod
+		y := xyseq[i].ud + ymod
+		if x >= 0 && x < len(l.area[0]) && y >= 0 && y < len(l.area) {
+			l.area[y][x] = &levelElement{
+				elementType: cactusType,
+				posX:        x,
+				posY:        y,
+			}
+		}
+	}
 
 	// check that the level is solvable
 
