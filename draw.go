@@ -23,4 +23,5 @@ import (
 // Draw implements the Draw method of the ebiten Game interface
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.level.Draw(screen)
+	g.hud.Draw(screen)
 }

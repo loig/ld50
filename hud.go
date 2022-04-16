@@ -16,15 +16,34 @@
 */
 package main
 
-// Game implements the Game interface from ebiten
-type Game struct {
-	level level
-	hud   hud
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"image/color"
+)
+
+type hud struct {
+	life int
 }
 
-func initGame() *Game {
-	g := Game{}
-	g.level = initLevel(15, 10)
-	g.hud = initHud()
-	return &g
+func initHud() (h hud) {
+	h.life = 3
+	return
+}
+
+func (h *hud) ReduceLife() {
+	h.life--
+}
+
+func (h hud) Draw(screen *ebiten.Image) {
+	for i := 0; i < h.life; i++ {
+		ebitenutil.DrawRect(
+			screen,
+			float64(globHudLifeSep/2+i*(globHudLifeSize+globHudLifeSep)+globHudPositionX),
+			float64(globHudPositionY),
+			float64(globHudLifeSize),
+			float64(globHudLifeSize),
+			color.RGBA{255, 0, 0, 255},
+		)
+	}
 }

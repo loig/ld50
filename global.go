@@ -27,4 +27,8 @@ const (
 	globMoveUp        = 1
 	globMoveRight     = 2
 	globMoveDown      = 3
+	globHudPositionX  = 0
+	globHudPositionY  = 300
+	globHudLifeSize   = 30
+	globHudLifeSep    = 10
 )

@@ -60,7 +60,7 @@ func initLevel(sizeX, sizeY int) (l level) {
 	return
 }
 
-func (l *level) Update() {
+func (l *level) Update() (hurt bool) {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
 		l.ChangeSelected()
@@ -68,22 +68,23 @@ func (l *level) Update() {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		l.MoveSelected(globMoveLeft)
+		hurt = l.MoveSelected(globMoveLeft)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		l.MoveSelected(globMoveRight)
+		hurt = l.MoveSelected(globMoveRight)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		l.MoveSelected(globMoveUp)
+		hurt = l.MoveSelected(globMoveUp)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		l.MoveSelected(globMoveDown)
+		hurt = l.MoveSelected(globMoveDown)
 	}
 
+	return
 }
 
 func (l *level) ChangeSelected() {
 	l.selected = (l.selected + 1) % len(l.movable)
 }
 
-func (l *level) MoveSelected(direction int) {
+func (l *level) MoveSelected(direction int) (hurt bool) {
 	var moveX, moveY int
 	switch direction {
 	case globMoveUp:
@@ -107,6 +108,9 @@ func (l *level) MoveSelected(direction int) {
 
 	for i >= 0 && i < len(l.area) && j >= 0 && j < len(l.area[0]) {
 		if l.area[i][j] != nil {
+			hurt =
+				(toMove.elementType == persoType && l.area[i][j].elementType == scorpionType) ||
+					(toMove.elementType == snakeType && l.area[i][j].elementType == persoType)
 			break
 		}
 
@@ -124,6 +128,7 @@ func (l *level) MoveSelected(direction int) {
 
 	l.area[i][j] = toMove
 
+	return
 }
 
 func (l level) Draw(screen *ebiten.Image) {
