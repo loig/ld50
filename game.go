@@ -24,12 +24,12 @@ type Game struct {
 
 func initGame() *Game {
 	g := Game{}
-	g.level = initLevel(15, 10)
+	g.level = initLevel(globLevelX, globLevelY)
 	g.hud = initHud()
 	return &g
 }
 
 func (g *Game) NextLevel() {
 	g.hud.NextLevel()
-	g.level = initLevel(15, 10)
+	g.level = initLevel(globLevelX, globLevelY)
 }

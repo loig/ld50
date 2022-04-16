@@ -94,6 +94,159 @@ func (l *level) GenArea() {
 
 	// transform the step sequence in a sequence of positions on the grid
 
-	// put obstacles according to the position sequence
+	// up/down
+	yseq := make([]int, numUpDown+1)
+	possibleYPos := make([]int, numUpDown-1)
+	for i := 1; i < numUpDown; i++ {
+		possibleYPos[i-1] = i
+	}
+	yseq[0] = numUpDown
+	nextAvailableYPos := numUpDown - 2
+	for i := 0; i < len(upDowns); i++ {
+		if i == len(upDowns)-1 {
+			yseq[i+1] = 0
+		} else if len(possibleYPos) == 1 {
+			yseq[i+1] = possibleYPos[0]
+		} else {
+			next := upDowns[i+1]
+			nextPos := i + 1
+			countNext := 1
+			for nextPos < len(upDowns)-2 && upDowns[nextPos+1] == next {
+				nextPos++
+				countNext++
+			}
+			log.Print(
+				"iter: ", i,
+				"\nmove: ", upDowns[i],
+				"\nnaposid: ", nextAvailableYPos,
+				"\nlastpos: ", yseq[i],
+				"\nremainingpos: ", possibleYPos,
+				"\nupDowns: ", upDowns,
+				"\nnextmovetype: ", next,
+				"\nnextmovecount: ", countNext)
+			if upDowns[i] == 0 {
+				if next == 0 {
+					var pos int
+					if nextAvailableYPos < countNext {
+						pos = nextAvailableYPos
+					} else {
+						pos = rand.Intn(nextAvailableYPos-countNext+1) + countNext
+					}
+					yseq[i+1] = possibleYPos[pos]
+					possibleYPos = append(possibleYPos[:pos], possibleYPos[pos+1:]...)
+					nextAvailableYPos = pos - 1
+				} else {
+					var pos int
+					if nextAvailableYPos > len(possibleYPos)-countNext-1 {
+						nextAvailableYPos = len(possibleYPos) - countNext - 1
+					}
+					if nextAvailableYPos > 0 {
+						pos = rand.Intn(nextAvailableYPos)
+					} else {
+						pos = nextAvailableYPos
+					}
+					yseq[i+1] = possibleYPos[pos]
+					possibleYPos = append(possibleYPos[:pos], possibleYPos[pos+1:]...)
+					nextAvailableYPos = pos
+				}
+			} else {
+				if next == 0 {
+					var pos int
+					if nextAvailableYPos >= countNext {
+						pos = nextAvailableYPos + rand.Intn(len(possibleYPos)-nextAvailableYPos)
+					} else {
+						pos = countNext + rand.Intn((len(possibleYPos) - countNext))
+					}
+					yseq[i+1] = possibleYPos[pos]
+					possibleYPos = append(possibleYPos[:pos], possibleYPos[pos+1:]...)
+					nextAvailableYPos = pos - 1
+				} else {
+					pos := nextAvailableYPos + rand.Intn(len(possibleYPos)-countNext+1)
+					yseq[i+1] = possibleYPos[pos]
+					possibleYPos = append(possibleYPos[:pos], possibleYPos[pos+1:]...)
+					nextAvailableYPos = pos
+				}
+			}
+		}
+	}
+
+	log.Print(yseq)
+
+	// left/right
+	xseq := make([]int, numLeftRight+1)
+	possibleXPos := make([]int, 2*(numLeftRight-1))
+	for i := 0; i < len(possibleXPos); i++ {
+		if i < len(possibleXPos)/2 {
+			possibleXPos[i] = i
+		} else {
+			possibleXPos[i] = i + 1
+		}
+	}
+	xseq[0] = len(possibleXPos) / 2
+	nextAvailableXPos := len(possibleXPos) / 2
+	if leftRights[0] == 2 {
+		nextAvailableXPos--
+	}
+	for i := 0; i < len(leftRights); i++ {
+		if i == len(leftRights)-1 {
+			xseq[i+1] = xseq[0]
+		} else {
+			next := leftRights[i+1]
+			nextPos := i + 1
+			countNext := 1
+			for nextPos < len(leftRights)-2 && leftRights[nextPos+1] == next {
+				nextPos++
+				countNext++
+			}
+			log.Print(
+				"iter: ", i,
+				"\nmove: ", leftRights[i],
+				"\nnaposid: ", nextAvailableXPos,
+				"\nlastpos: ", xseq[i],
+				"\nremainingpos: ", possibleXPos,
+				"\nupDowns: ", leftRights,
+				"\nnextmovetype: ", next,
+				"\nnextmovecount: ", countNext)
+			if leftRights[i] == 2 {
+				if next == 2 {
+					var pos int
+					// TODO gen pos
+          
+					xseq[i+1] = possibleXPos[pos]
+					possibleXPos = append(possibleXPos[:pos], possibleXPos[pos+1:]...)
+					nextAvailableXPos = pos - 1
+				} else {
+					var pos int
+					// TODO gen pos
+
+					xseq[i+1] = possibleXPos[pos]
+					possibleXPos = append(possibleXPos[:pos], possibleXPos[pos+1:]...)
+					nextAvailableXPos = pos
+				}
+			} else {
+				if next == 2 {
+					var pos int
+					// TODO gen pos
+
+					xseq[i+1] = possibleXPos[pos]
+					possibleXPos = append(possibleXPos[:pos], possibleXPos[pos+1:]...)
+					nextAvailableXPos = pos - 1
+				} else {
+					var pos int
+					// TODO gen pos
+
+					xseq[i+1] = possibleXPos[pos]
+					possibleXPos = append(possibleXPos[:pos], possibleXPos[pos+1:]...)
+					nextAvailableXPos = pos
+				}
+			}
+		}
+	}
+
+	log.Print(yseq)
+
+	// put obstacles according to the position sequence and the step sequence
+
+	// check that the level is solvable
 
 }

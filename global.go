@@ -38,4 +38,6 @@ const (
 	globWaterSep       = 10
 	globWaterDrink     = 25
 	globNumSteps       = 8
+	globLevelX         = 15
+	globLevelY         = 12
 )
