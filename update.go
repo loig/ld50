@@ -18,5 +18,8 @@ package main
 
 // Update implements the Update method of the ebiten Game interface
 func (g *Game) Update() error {
+
+	g.level.Update()
+
 	return nil
 }

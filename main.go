@@ -26,9 +26,9 @@ func main() {
 	ebiten.SetWindowTitle(globTitle)
 	ebiten.SetWindowSize(globScreenWidth, globScreenHeight)
 
-	g := Game{}
+	g := initGame()
 
-	if err := ebiten.RunGame(&g); err != nil {
+	if err := ebiten.RunGame(g); err != nil {
 		log.Print(err)
 	}
 

@@ -1,5 +1,4 @@
-/*
-  LD50, a game for Ludum Dare 50
+/*LD50, a game for Ludum Dare 50
   Copyright (C) 2022  Loïg Jezequel
 
   This program is free software: you can redistribute it and/or modify
@@ -18,7 +17,14 @@
 package main
 
 const (
-	globScreenWidth  = 800
-	globScreenHeight = 600
-	globTitle        = "ld50"
+	globScreenWidth   = 800
+	globScreenHeight  = 600
+	globTitle         = "ld50"
+	globAreaPositionX = 0
+	globAreaPositionY = 0
+	globAreaCellSize  = 20
+	globMoveLeft      = 0
+	globMoveUp        = 1
+	globMoveRight     = 2
+	globMoveDown      = 3
 )

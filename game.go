@@ -17,4 +17,12 @@
 package main
 
 // Game implements the Game interface from ebiten
-type Game struct{}
+type Game struct {
+	level level
+}
+
+func initGame() *Game {
+	g := Game{}
+	g.level = initLevel(15, 10)
+	return &g
+}
