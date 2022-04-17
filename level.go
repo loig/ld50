@@ -31,7 +31,7 @@ type level struct {
 	selected     int
 }
 
-func initLevel(sizeX, sizeY int) (l level) {
+func initLevel(sizeX, sizeY int, withSnakes, withScorpions bool) (l level) {
 	l.area = make([][]*levelElement, sizeY)
 	for i := 0; i < sizeY; i++ {
 		l.area[i] = make([]*levelElement, sizeX)
@@ -46,9 +46,7 @@ func initLevel(sizeX, sizeY int) (l level) {
 	l.goalY = 0
 
 	// gen level
-	// nothing on goal, nothing on perso
-	l.GenArea()
-	// end gen level
+	l.GenArea(withSnakes, withScorpions)
 
 	l.movable = make([]*levelElement, 0)
 	var selectedPos int
@@ -118,7 +116,7 @@ func (l *level) MoveSelected(direction int) (hurt, food, water bool) {
 	j += moveX
 
 	for i >= 0 && i < len(l.area) && j >= 0 && j < len(l.area[0]) {
-		if l.area[i][j] != nil {
+		if l.area[i][j] != nil && l.area[i][j].elementType != nilType {
 			hurt =
 				(toMove.elementType == persoType && l.area[i][j].elementType == scorpionType) ||
 					(toMove.elementType == snakeType && l.area[i][j].elementType == persoType)

@@ -62,6 +62,14 @@ func (e levelElement) Draw(screen *ebiten.Image) {
 			float64(globAreaCellSize), float64(globAreaCellSize),
 			c,
 		)
+	} else {
+		ebitenutil.DrawRect(
+			screen,
+			float64(e.posX*globAreaCellSize+globAreaPositionX),
+			float64(e.posY*globAreaCellSize+globAreaPositionY),
+			float64(globAreaCellSize), float64(globAreaCellSize),
+			color.RGBA{100, 100, 100, 255},
+		)
 	}
 }
 

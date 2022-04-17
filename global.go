@@ -42,4 +42,7 @@ const (
 	globLevelY         = 12
 	globXDivider       = 3
 	globYDivider       = 2
+	globNumCactus      = 12
+	globNumSnakes      = 2
+	globNumScorpions   = 2
 )

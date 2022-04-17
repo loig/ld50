@@ -25,7 +25,7 @@ type posCuple struct {
 	lr, ud int
 }
 
-func (l *level) GenArea() {
+func (l *level) GenArea(withSnakes, withScorpions bool) {
 
 	// choose a number of steps
 	numSteps := rand.Intn(globNumSteps-2) + 3
@@ -171,12 +171,6 @@ func (l *level) GenArea() {
 			ymod = -1
 		}
 
-		l.area[xyseq[i].ud][xyseq[i].lr] = &levelElement{
-			elementType: foodType,
-			posX:        xyseq[i].lr,
-			posY:        xyseq[i].ud,
-		}
-
 		x := xyseq[i].lr + xmod
 		y := xyseq[i].ud + ymod
 		if x >= 0 && x < len(l.area[0]) && y >= 0 && y < len(l.area) {
@@ -188,6 +182,274 @@ func (l *level) GenArea() {
 		}
 	}
 
-	// check that the level is solvable
+	// get the expected path
+	path := make([][]bool, len(l.area))
+	pathlen := -2
+	for i := 0; i < len(path); i++ {
+		path[i] = make([]bool, len(l.area[0]))
+	}
+
+	for i := 1; i < len(xyseq); i++ {
+		if xyseq[i].ud != xyseq[i-1].ud {
+			start := xyseq[i].ud
+			end := xyseq[i-1].ud
+			if start > end {
+				start, end = end, start
+			}
+			for j := start; j <= end; j++ {
+				path[j][xyseq[i].lr] = true
+				pathlen++
+			}
+		} else {
+			start := xyseq[i].lr
+			end := xyseq[i-1].lr
+			if start > end {
+				start, end = end, start
+			}
+			for j := start; j <= end; j++ {
+				path[xyseq[i].ud][j] = true
+				pathlen++
+			}
+		}
+	}
+
+	// add cactus on center path if needed
+	hasCactus := false
+	for y := 0; y < len(l.area); y++ {
+		hasCactus = hasCactus || (l.area[y][len(l.area[y])/2] != nil) && (l.area[y][len(l.area[y])/2].elementType == cactusType)
+	}
+	if !hasCactus {
+		cacRand := rand.Intn(len(l.area))
+		cacPos := 0
+		for cacRand >= 0 {
+			if !path[cacPos][len(l.area[cacPos])/2] {
+				cacRand--
+			}
+			if cacRand >= 0 {
+				cacPos = (cacPos + 1) % len(l.area)
+			}
+		}
+		l.area[cacPos][len(l.area[cacPos])/2] = &levelElement{
+			elementType: cactusType,
+			posX:        len(l.area[cacPos]) / 2,
+			posY:        cacPos,
+		}
+	}
+
+	// add cactus on left path if needed
+	hasCactus = false
+	possiblePos := make([]posCuple, 0)
+	x := len(l.area[0]) / 2
+	mid := x
+	y := 0
+	for x != mid || y != len(l.area)-1 {
+		if y == 0 && x != 0 {
+			x--
+			hasCactus = hasCactus || (l.area[y][x] != nil && l.area[y][x].elementType == cactusType)
+			if !path[y][x] {
+				possiblePos = append(possiblePos, posCuple{lr: x, ud: y})
+			}
+			continue
+		}
+
+		if x == 0 && y != len(l.area)-1 {
+			y++
+			hasCactus = hasCactus || (l.area[y][x] != nil && l.area[y][x].elementType == cactusType)
+			if !path[y][x] {
+				possiblePos = append(possiblePos, posCuple{lr: x, ud: y})
+			}
+			continue
+		}
+
+		x++
+		hasCactus = hasCactus || (l.area[y][x] != nil && l.area[y][x].elementType == cactusType)
+		if !path[y][x] {
+			possiblePos = append(possiblePos, posCuple{lr: x, ud: y})
+		}
+	}
+
+	log.Print(hasCactus, possiblePos)
+
+	if !hasCactus && len(possiblePos) > 0 {
+		choice := rand.Intn(len(possiblePos))
+		l.area[possiblePos[choice].ud][possiblePos[choice].lr] = &levelElement{
+			elementType: cactusType,
+			posX:        possiblePos[choice].lr,
+			posY:        possiblePos[choice].ud,
+		}
+	}
+
+	// add cactus on right path if needed
+	hasCactus = false
+	possiblePos = make([]posCuple, 0)
+	x = len(l.area[0]) / 2
+	y = 0
+	for x != mid || y != len(l.area)-1 {
+		if y == 0 && x != len(l.area[0])-1 {
+			x++
+			hasCactus = hasCactus || (l.area[y][x] != nil && l.area[y][x].elementType == cactusType)
+			if !path[y][x] {
+				possiblePos = append(possiblePos, posCuple{lr: x, ud: y})
+			}
+			continue
+		}
+
+		if x == len(l.area[0])-1 && y != len(l.area)-1 {
+			y++
+			hasCactus = hasCactus || (l.area[y][x] != nil && l.area[y][x].elementType == cactusType)
+			if !path[y][x] {
+				possiblePos = append(possiblePos, posCuple{lr: x, ud: y})
+			}
+			continue
+		}
+
+		x--
+		hasCactus = hasCactus || (l.area[y][x] != nil && l.area[y][x].elementType == cactusType)
+		if !path[y][x] {
+			possiblePos = append(possiblePos, posCuple{lr: x, ud: y})
+		}
+	}
+
+	log.Print(hasCactus, possiblePos)
+
+	if !hasCactus && len(possiblePos) > 0 {
+		choice := rand.Intn(len(possiblePos))
+		l.area[possiblePos[choice].ud][possiblePos[choice].lr] = &levelElement{
+			elementType: cactusType,
+			posX:        possiblePos[choice].lr,
+			posY:        possiblePos[choice].ud,
+		}
+	}
+
+	// add a few more cactus
+	isFree := func(i, j int) bool {
+		if l.area[i][j] != nil || path[i][j] {
+			return false
+		}
+
+		if i > 0 && l.area[i-1][j] != nil {
+			return false
+		}
+
+		if j > 0 && l.area[i][j-1] != nil {
+			return false
+		}
+
+		if i < len(l.area)-2 && l.area[i+1][j] != nil {
+			return false
+		}
+
+		if j < len(l.area[0])-2 && l.area[i][j+1] != nil {
+			return false
+		}
+
+		return true
+	}
+
+	numCactus := 0
+	numFree := 0
+	for i := 0; i < len(l.area); i++ {
+		for j := 0; j < len(l.area); j++ {
+			if l.area[i][j] != nil && l.area[i][j].elementType == cactusType {
+				numCactus++
+			} else if isFree(i, j) {
+				numFree++
+			}
+		}
+	}
+
+	toAdd := rand.Intn(globNumCactus) + 1 - numCactus
+	if toAdd < numFree {
+		for toAdd > 0 {
+			addPos := rand.Intn(numFree)
+		OneCactusLoop:
+			for i := 0; i < len(l.area); i++ {
+				for j := 0; j < len(l.area[0]); j++ {
+					if isFree(i, j) {
+						addPos--
+						if addPos < 0 {
+							l.area[i][j] = &levelElement{
+								elementType: cactusType,
+								posX:        j,
+								posY:        i,
+							}
+							break OneCactusLoop
+						}
+					}
+				}
+			}
+			numFree--
+			toAdd--
+		}
+	}
+
+	// add a few scorpions
+	if withScorpions {
+		numScorpions := rand.Intn(globNumScorpions) + 1
+		for numScorpions > 0 {
+			if rand.Intn(2) == 0 {
+				// on path
+				pos := rand.Intn(pathlen)
+			OneScorpionLoopA:
+				for i := 0; i < len(path); i++ {
+					for j := 0; j < len(path[0]); j++ {
+						if path[i][j] && (j != mid || (i != 0 && i != len(path)-1)) {
+							if pos == 0 {
+								l.area[i][j] = &levelElement{
+									elementType: scorpionType,
+									posX:        j,
+									posY:        i,
+								}
+								break OneScorpionLoopA
+							}
+							pos--
+						}
+					}
+				}
+			} else {
+				// not necessarily on path
+				pos := rand.Intn(pathlen + numFree)
+			OneScorpionLoopB:
+				for i := 0; i < len(path); i++ {
+					for j := 0; j < len(path[0]); j++ {
+						if (path[i][j] || isFree(i, j)) && (j != mid || (i != 0 && i != len(path)-1)) {
+							if pos == 0 {
+								l.area[i][j] = &levelElement{
+									elementType: scorpionType,
+									posX:        j,
+									posY:        i,
+								}
+								break OneScorpionLoopB
+							}
+							pos--
+						}
+					}
+				}
+			}
+			numScorpions--
+		}
+	}
+
+	// add a few snakes
+	if withSnakes {
+
+	}
+
+	// for debug only
+	for i := 0; i < len(l.area); i++ {
+		for j := 0; j < len(l.area[0]); j++ {
+			if path[i][j] {
+				if l.area[i][j] == nil {
+					l.area[i][j] = &levelElement{
+						elementType: nilType,
+						posX:        j,
+						posY:        i,
+					}
+				} else {
+					log.Print("Warning, found ", l.area[i][j], " on path")
+				}
+			}
+		}
+	}
 
 }
