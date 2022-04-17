@@ -25,7 +25,7 @@ type posCuple struct {
 	lr, ud int
 }
 
-func (l *level) GenArea(withSnakes, withScorpions bool) {
+func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 
 	// choose a number of steps
 	numSteps := rand.Intn(globNumSteps-2) + 3
@@ -153,7 +153,9 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 
 	log.Print("real coordinates: ", xyseq)
 
-	// put cactus according to the position sequence and the step sequence
+	// put cactus (or water or food) according to the position sequence and the step sequence
+	numWater := rand.Intn(globNumWater) + 1
+	numFood := rand.Intn(globNumFood) + 1
 	for i := 1; i < len(xyseq); i++ {
 		xmod := 0
 		xdiff := xyseq[i].lr - xyseq[i-1].lr
@@ -171,6 +173,26 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 			ymod = -1
 		}
 
+		isWater := false
+		isFood := false
+
+		if xyseq[i].lr != len(l.area[0])/2 || (xyseq[i].ud != 0 && xyseq[i].ud != len(l.area)-1) {
+			if withWater && numWater > 0 && rand.Intn(globProbaWaterOnPath) == 0 {
+				isWater = true
+				numWater--
+			}
+
+			if !isWater && withFood && numFood > 0 && rand.Intn(globProbaFoodOnPath) == 0 {
+				isFood = true
+				numFood--
+			}
+		}
+
+		if isWater || isFood {
+			xmod = 0
+			ymod = 0
+		}
+
 		x := xyseq[i].lr + xmod
 		y := xyseq[i].ud + ymod
 		if x >= 0 && x < len(l.area[0]) && y >= 0 && y < len(l.area) {
@@ -178,6 +200,14 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 				elementType: cactusType,
 				posX:        x,
 				posY:        y,
+			}
+
+			if isWater {
+				l.area[y][x].elementType = waterType
+			}
+
+			if isFood {
+				l.area[y][x].elementType = foodType
 			}
 		}
 	}
@@ -384,6 +414,59 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 		}
 	}
 
+	// add more water and food if needed
+	if withWater && numWater > 0 {
+		for numWater > 0 && numFree > 0 {
+			pos := rand.Intn(numFree + pathlen)
+		OneWaterLoop:
+			for i := 0; i < len(path); i++ {
+				for j := 0; j < len(path[0]); j++ {
+					if (path[i][j] || isFree(i, j)) && (j != mid || (i != 0 && i != len(path)-1)) {
+						if pos == 0 {
+							if isFree(i, j) {
+								numFree--
+							}
+							l.area[i][j] = &levelElement{
+								elementType: waterType,
+								posX:        j,
+								posY:        i,
+							}
+							numWater--
+							break OneWaterLoop
+						}
+						pos--
+					}
+				}
+			}
+		}
+	}
+
+	if withFood && numFood > 0 {
+		for numFood > 0 && numFree > 0 {
+			pos := rand.Intn(numFree + pathlen)
+		OneFoodLoop:
+			for i := 0; i < len(path); i++ {
+				for j := 0; j < len(path[0]); j++ {
+					if (path[i][j] || isFree(i, j)) && (j != mid || (i != 0 && i != len(path)-1)) {
+						if pos == 0 {
+							if isFree(i, j) {
+								numFree--
+							}
+							l.area[i][j] = &levelElement{
+								elementType: foodType,
+								posX:        j,
+								posY:        i,
+							}
+							numFood--
+							break OneFoodLoop
+						}
+						pos--
+					}
+				}
+			}
+		}
+	}
+
 	// add a few scorpions
 	if withScorpions {
 		numScorpions := rand.Intn(globNumScorpions) + 1
@@ -395,7 +478,7 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 				for i := 0; i < len(path); i++ {
 					for j := 0; j < len(path[0]); j++ {
 						if path[i][j] && (j != mid || (i != 0 && i != len(path)-1)) {
-							if pos == 0 {
+							if pos <= 0 && l.area[i][j] == nil {
 								l.area[i][j] = &levelElement{
 									elementType: scorpionType,
 									posX:        j,
@@ -415,6 +498,9 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 					for j := 0; j < len(path[0]); j++ {
 						if (path[i][j] || isFree(i, j)) && (j != mid || (i != 0 && i != len(path)-1)) {
 							if pos == 0 {
+								if isFree(i, j) {
+									numFree--
+								}
 								l.area[i][j] = &levelElement{
 									elementType: scorpionType,
 									posX:        j,
@@ -440,8 +526,11 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 			for i := 0; i < len(path); i++ {
 				for j := 0; j < len(path[0]); j++ {
 					if l.area[i][j] != nil && l.area[i][j].elementType == cactusType {
-						if pos == 0 {
+						if pos <= 0 &&
+							j != mid && j != 0 && j != len(l.area[0])-1 &&
+							((i != 0 && i != len(l.area)-1) || j == mid-1 || j == mid+1) {
 							l.area[i][j].elementType = snakeType
+							numCactus--
 							break OneSnakeLoop
 						}
 						pos--
@@ -450,7 +539,15 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 			}
 			numSnakes--
 		}
+	}
 
+	// move snakes
+	for i := 0; i < len(l.area); i++ {
+		for j := 0; j < len(l.area[i]); j++ {
+			if l.area[i][j] != nil && l.area[i][j].elementType == snakeType {
+
+			}
+		}
 	}
 
 	// for debug only

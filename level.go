@@ -31,7 +31,7 @@ type level struct {
 	selected     int
 }
 
-func initLevel(sizeX, sizeY int, withSnakes, withScorpions bool) (l level) {
+func initLevel(sizeX, sizeY int, withSnakes, withScorpions, withFood, withWater bool) (l level) {
 	l.area = make([][]*levelElement, sizeY)
 	for i := 0; i < sizeY; i++ {
 		l.area[i] = make([]*levelElement, sizeX)
@@ -46,7 +46,7 @@ func initLevel(sizeX, sizeY int, withSnakes, withScorpions bool) (l level) {
 	l.goalY = 0
 
 	// gen level
-	l.GenArea(withSnakes, withScorpions)
+	l.GenArea(withSnakes, withScorpions, withFood, withWater)
 
 	l.movable = make([]*levelElement, 0)
 	var selectedPos int
