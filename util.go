@@ -16,38 +16,15 @@
 */
 package main
 
-// Game implements the Game interface from ebiten
-type Game struct {
-	step    int
-	subStep int
-	level   level
-	hud     hud
-}
-
-// Game steps
-const (
-	stepTitle int = iota
-	stepCredits
-	stepTuto
-	stepLevel
-	stepDead
+import (
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-func initGame() *Game {
-	g := Game{}
-	g.level = initLevel(globLevelX, globLevelY, false, false, false, false)
-	g.hud = initHud()
-	return &g
-}
-
-func (g *Game) NextLevel(skip bool) {
-	if !skip {
-		g.hud.NextLevel()
+func isAnyKeyJustPressed() bool {
+	for _, key := range inpututil.PressedKeys() {
+		if inpututil.IsKeyJustPressed(key) {
+			return true
+		}
 	}
-	g.level = initLevel(globLevelX, globLevelY, true, true, true, true)
-}
-
-func (g *Game) Reset() {
-	g.hud.Reset()
-	g.level = initLevel(globLevelX, globLevelY, false, false, false, false)
+	return false
 }

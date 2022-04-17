@@ -35,12 +35,16 @@ type hud struct {
 
 func initHud() (h hud) {
 	h.lifeMax = 3
-	h.life = h.lifeMax
 	h.waterMax = 1000
+	h.Reset()
+	return
+}
+
+func (h *hud) Reset() {
+	h.life = h.lifeMax
 	h.water = h.waterMax
 	h.waterStep = 1
 	h.levelNum = 1
-	return
 }
 
 func (h *hud) NextLevel() {

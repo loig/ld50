@@ -54,7 +54,7 @@ const (
 	globProbaMoveSnake   = 3
 	globNumMoving        = 3
 	globLevelNumPosX     = globAreaPositionX
-	globLevelNumPosY     = 0
+	globLevelNumPosY     = 5
 	globScorePosX        = 0
 	globScorePosY        = 0
 )

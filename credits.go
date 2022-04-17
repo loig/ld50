@@ -16,38 +16,24 @@
 */
 package main
 
-// Game implements the Game interface from ebiten
-type Game struct {
-	step    int
-	subStep int
-	level   level
-	hud     hud
-}
-
-// Game steps
-const (
-	stepTitle int = iota
-	stepCredits
-	stepTuto
-	stepLevel
-	stepDead
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-func initGame() *Game {
-	g := Game{}
-	g.level = initLevel(globLevelX, globLevelY, false, false, false, false)
-	g.hud = initHud()
-	return &g
-}
-
-func (g *Game) NextLevel(skip bool) {
-	if !skip {
-		g.hud.NextLevel()
+func (g *Game) UpdateCredits() {
+	if isAnyKeyJustPressed() {
+		g.step = stepTitle
 	}
-	g.level = initLevel(globLevelX, globLevelY, true, true, true, true)
 }
 
-func (g *Game) Reset() {
-	g.hud.Reset()
-	g.level = initLevel(globLevelX, globLevelY, false, false, false, false)
+func (g *Game) DrawCredits(screen *ebiten.Image) {
+
+	ebitenutil.DebugPrintAt(screen, "A game made in", 15, 0)
+	ebitenutil.DebugPrintAt(screen, "more or less 48h", 10, 15)
+	ebitenutil.DebugPrintAt(screen, "for LD50", 35, 30)
+	ebitenutil.DebugPrintAt(screen, "Thanks to Cécile", 10, 50)
+	ebitenutil.DebugPrintAt(screen, "for the graphics!", 8, 65)
+	ebitenutil.DebugPrintAt(screen, "Code at github.com:", 2, 85)
+	ebitenutil.DebugPrintAt(screen, "loig/ld50", 32, 100)
 }

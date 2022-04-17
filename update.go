@@ -19,20 +19,26 @@ package main
 // Update implements the Update method of the ebiten Game interface
 func (g *Game) Update() error {
 
-	hurt, food, water, finished, skip := g.level.Update()
-
-  if skip {
-    g.NextLevel(skip)
-  }
-
-	dead := g.hud.Update(hurt, food, water)
-
-	if dead {
-
-	}
-
-	if finished {
-		g.NextLevel(false)
+	switch g.step {
+	case stepTitle:
+		g.UpdateTitle()
+	case stepCredits:
+		g.UpdateCredits()
+	case stepTuto:
+	case stepLevel:
+		hurt, food, water, finished, skip := g.level.Update()
+		if skip {
+			g.NextLevel(skip)
+		}
+		dead := g.hud.Update(hurt, food, water)
+		if dead {
+			g.step = stepDead
+		}
+		if finished {
+			g.NextLevel(false)
+		}
+	case stepDead:
+		g.UpdateDead()
 	}
 
 	return nil

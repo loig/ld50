@@ -16,38 +16,22 @@
 */
 package main
 
-// Game implements the Game interface from ebiten
-type Game struct {
-	step    int
-	subStep int
-	level   level
-	hud     hud
-}
-
-// Game steps
-const (
-	stepTitle int = iota
-	stepCredits
-	stepTuto
-	stepLevel
-	stepDead
+import (
+	"fmt"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-func initGame() *Game {
-	g := Game{}
-	g.level = initLevel(globLevelX, globLevelY, false, false, false, false)
-	g.hud = initHud()
-	return &g
-}
-
-func (g *Game) NextLevel(skip bool) {
-	if !skip {
-		g.hud.NextLevel()
+func (g *Game) UpdateDead() {
+	if isAnyKeyJustPressed() {
+		g.step = stepTitle
+		g.Reset()
 	}
-	g.level = initLevel(globLevelX, globLevelY, true, true, true, true)
 }
 
-func (g *Game) Reset() {
-	g.hud.Reset()
-	g.level = initLevel(globLevelX, globLevelY, false, false, false, false)
+func (g *Game) DrawDead(screen *ebiten.Image) {
+
+	ebitenutil.DebugPrintAt(screen, "You died!", 30, 30)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprint("(at level ", g.hud.levelNum, ")"), 20, 45)
+
 }

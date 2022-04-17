@@ -22,6 +22,18 @@ import (
 
 // Draw implements the Draw method of the ebiten Game interface
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.level.Draw(screen)
-	g.hud.Draw(screen)
+
+	switch g.step {
+	case stepTitle:
+		g.DrawTitle(screen)
+	case stepCredits:
+		g.DrawCredits(screen)
+	case stepTuto:
+	case stepLevel:
+		g.level.Draw(screen)
+		g.hud.Draw(screen)
+	case stepDead:
+		g.DrawDead(screen)
+	}
+
 }
