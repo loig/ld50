@@ -37,12 +37,12 @@ const (
 	globWaterHeight    = 10
 	globWaterSep       = 10
 	globWaterDrink     = 25
-	globNumSteps       = 8
-	globLevelX         = 15
-	globLevelY         = 12
+	globNumSteps       = 5
+	globLevelX         = 11
+	globLevelY         = 8
 	globXDivider       = 3
 	globYDivider       = 2
-	globNumCactus      = 12
+	globNumCactus      = 6
 	globNumSnakes      = 2
 	globNumScorpions   = 2
 )

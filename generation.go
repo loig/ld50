@@ -380,6 +380,7 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 			}
 			numFree--
 			toAdd--
+			numCactus++
 		}
 	}
 
@@ -430,8 +431,25 @@ func (l *level) GenArea(withSnakes, withScorpions bool) {
 		}
 	}
 
-	// add a few snakes
+	// add a few snakes to replace some cactus
 	if withSnakes {
+		numSnakes := rand.Intn(globNumSnakes) + 1
+		for numSnakes > 0 {
+			pos := rand.Intn(numCactus)
+		OneSnakeLoop:
+			for i := 0; i < len(path); i++ {
+				for j := 0; j < len(path[0]); j++ {
+					if l.area[i][j] != nil && l.area[i][j].elementType == cactusType {
+						if pos == 0 {
+							l.area[i][j].elementType = snakeType
+							break OneSnakeLoop
+						}
+						pos--
+					}
+				}
+			}
+			numSnakes--
+		}
 
 	}
 
