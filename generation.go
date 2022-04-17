@@ -115,10 +115,8 @@ func (l *level) GenArea() {
 	log.Print("everything: ", xyseq)
 
 	// from positions, get coordinates
-	xshift := rand.Intn(globXDivider)
 	lastx := -1
 	lasty := -1
-	yshift := rand.Intn(globYDivider)
 	for i := 0; i < len(xyseq); i++ {
 		x := xyseq[i].lr
 		if x == lastx {
@@ -127,14 +125,10 @@ func (l *level) GenArea() {
 			lastx = x
 			if x == (len(l.area[0])/globXDivider-1)/2 {
 				x = len(l.area[0]) / 2
-				xshift = rand.Intn(globXDivider)
+			} else if x > lastx {
+				x = x*globXDivider + rand.Intn(globXDivider-1)
 			} else {
-				x = x*globXDivider + xshift
-				if xshift == globXDivider-1 {
-					xshift = rand.Intn(globXDivider-1) + 1
-				} else {
-					xshift = rand.Intn(globXDivider)
-				}
+				x = x*globXDivider + 1 + rand.Intn(globXDivider-1)
 			}
 			xyseq[i].lr = x
 		}
@@ -147,11 +141,10 @@ func (l *level) GenArea() {
 			if y == yseq[0] {
 				y = len(l.area) - 1
 			} else if y != 0 {
-				y = y*globYDivider + yshift
-				if yshift == globYDivider-1 {
-					yshift = rand.Intn(globYDivider-1) + 1
+				if y > lasty {
+					y = y*globYDivider + rand.Intn(globYDivider-1)
 				} else {
-					yshift = rand.Intn(globYDivider)
+					y = y*globYDivider + 1 + rand.Intn(globYDivider-1)
 				}
 			}
 			xyseq[i].ud = y
