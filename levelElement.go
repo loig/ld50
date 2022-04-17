@@ -18,8 +18,8 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"image/color"
+	//"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	//"image/color"
 )
 
 type levelElement struct {
@@ -41,29 +41,48 @@ const (
 
 func (e levelElement) Draw(screen *ebiten.Image) {
 	if e.elementType != nilType {
-		var c color.Color
+		//var c color.Color
+		var img *ebiten.Image
+		var xshift, yshift int
 		switch e.elementType {
 		case persoType:
-			c = color.RGBA{255, 0, 255, 255}
+			//c = color.RGBA{255, 0, 255, 255}
+			img = imagePerso[0]
+			yshift = -3
 		case cactusType:
-			c = color.RGBA{0, 255, 0, 255}
+			//c = color.RGBA{0, 255, 0, 255}
+			img = imageCactus
+			yshift = -4
 		case snakeType:
-			c = color.RGBA{0, 0, 255, 255}
+			//c = color.RGBA{0, 0, 255, 255}
+			img = imageSnake[0]
 		case scorpionType:
-			c = color.RGBA{255, 255, 0, 255}
+			//c = color.RGBA{255, 255, 0, 255}
+			img = imageScorpion[0]
 		case waterType:
-			c = color.RGBA{0, 255, 255, 255}
+			//c = color.RGBA{0, 255, 255, 255}
+			img = imageBottle
 		case foodType:
-			c = color.RGBA{255, 0, 0, 255}
+			//c = color.RGBA{255, 0, 0, 255}
+			img = imageFood
 		}
-		ebitenutil.DrawRect(
-			screen,
-			float64(e.posX*globAreaCellSize+globAreaPositionX),
-			float64(e.posY*globAreaCellSize+globAreaPositionY),
-			float64(globAreaCellSize), float64(globAreaCellSize),
-			c,
+		/*
+			ebitenutil.DrawRect(
+				screen,
+				float64(e.posX*globAreaCellSize+globAreaPositionX),
+				float64(e.posY*globAreaCellSize+globAreaPositionY),
+				float64(globAreaCellSize), float64(globAreaCellSize),
+				c,
+			)
+		*/
+		options := ebiten.DrawImageOptions{}
+		options.GeoM.Translate(
+			float64(e.posX*globAreaCellSize+globAreaPositionX+xshift),
+			float64(e.posY*globAreaCellSize+globAreaPositionY+yshift),
 		)
-	} else {
+		screen.DrawImage(img, &options)
+
+	} /*else {
 		ebitenutil.DrawRect(
 			screen,
 			float64(e.posX*globAreaCellSize+globAreaPositionX),
@@ -71,7 +90,7 @@ func (e levelElement) Draw(screen *ebiten.Image) {
 			float64(globAreaCellSize), float64(globAreaCellSize),
 			color.RGBA{100, 100, 100, 255},
 		)
-	}
+	}*/
 }
 
 func (e levelElement) IsMovable() bool {

@@ -28,6 +28,8 @@ func main() {
 
 	g := initGame()
 
+	loadAssets()
+
 	if err := ebiten.RunGame(g); err != nil {
 		log.Print(err)
 	}

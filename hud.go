@@ -20,7 +20,8 @@ import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"image/color"
+	"image"
+	//"image/color"
 )
 
 type hud struct {
@@ -59,8 +60,8 @@ func (h *hud) NextLevel(inTuto bool) {
 func (h *hud) Update(hurt, food, water, infiniteWater bool) (dead bool) {
 	if hurt {
 		h.life--
-		if h.life < 0 {
-			h.life = 0
+		if h.life < -1 {
+			h.life = -1
 		}
 	}
 	if food {
@@ -84,7 +85,7 @@ func (h *hud) Update(hurt, food, water, infiniteWater bool) (dead bool) {
 		}
 	}
 
-	dead = h.life <= 0 || h.water <= 0
+	dead = h.life < 0 || h.water <= 0
 
 	return
 }
@@ -102,27 +103,54 @@ func (h hud) Draw(screen *ebiten.Image, inTuto bool) {
 }
 
 func (h hud) DrawLife(screen *ebiten.Image) {
-	for i := 0; i < h.life; i++ {
-		ebitenutil.DrawRect(
-			screen,
+	for i := 0; i < h.lifeMax; i++ {
+		/*
+			ebitenutil.DrawRect(
+				screen,
+				float64(i*(globLifeSize+globLifeSep)+globLifePositionX),
+				float64(globLifePositionY),
+				float64(globLifeSize),
+				float64(globLifeSize),
+				color.RGBA{255, 0, 0, 255},
+			)
+		*/
+		options := ebiten.DrawImageOptions{}
+		options.GeoM.Translate(
 			float64(i*(globLifeSize+globLifeSep)+globLifePositionX),
 			float64(globLifePositionY),
-			float64(globLifeSize),
-			float64(globLifeSize),
-			color.RGBA{255, 0, 0, 255},
 		)
+		isok := 1
+		if i >= h.life {
+			isok = 0
+		}
+		screen.DrawImage(imageLife[isok], &options)
 	}
 }
 
 func (h hud) DrawWater(screen *ebiten.Image) {
-	ebitenutil.DrawRect(
-		screen,
+	/*
+		ebitenutil.DrawRect(
+			screen,
+			float64(globWaterPositionX),
+			float64(globWaterPositionY),
+			float64(globWaterWidth*h.water/h.waterMax),
+			float64(globWaterHeight),
+			color.RGBA{0, 255, 255, 255},
+		)
+	*/
+	options := ebiten.DrawImageOptions{}
+	options.GeoM.Translate(
 		float64(globWaterPositionX),
 		float64(globWaterPositionY),
-		float64(globWaterWidth*h.water/h.waterMax),
-		float64(globWaterHeight),
-		color.RGBA{0, 255, 255, 255},
 	)
+	screen.DrawImage(imageWater, &options)
+
+	options.GeoM.Translate(
+		float64(globWaterSep+globAreaCellSize),
+		1,
+	)
+	screen.DrawImage(imageWaterBar[1], &options)
+	screen.DrawImage(imageWaterBar[0].SubImage(image.Rect(0, 27, (45*h.water)/h.waterMax, 36)).(*ebiten.Image), &options)
 }
 
 func (h hud) DrawLevelNum(screen *ebiten.Image, inTuto bool) {

@@ -173,6 +173,8 @@ func (l level) Draw(screen *ebiten.Image) {
 
 	l.DrawGoal(screen)
 
+	l.DrawSelected(screen)
+
 	for _, line := range l.area {
 		for _, element := range line {
 			if element != nil {
@@ -181,7 +183,6 @@ func (l level) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	l.DrawSelected(screen)
 }
 
 func (l level) DrawBackground(screen *ebiten.Image) {
@@ -193,28 +194,54 @@ func (l level) DrawBackground(screen *ebiten.Image) {
 		float64(globAreaCellSize*len(l.area)),
 		color.RGBA{55, 55, 55, 255},
 	)
+	for i := 0; i < len(l.area); i++ {
+		for j := 0; j < len(l.area[0]); j++ {
+			options := ebiten.DrawImageOptions{}
+			options.GeoM.Translate(
+				float64(j*globAreaCellSize+globAreaPositionX),
+				float64(i*globAreaCellSize+globAreaPositionY),
+			)
+			screen.DrawImage(imageDesert[(i*len(l.area[0])+j)%2], &options)
+		}
+	}
 }
 
 func (l level) DrawGoal(screen *ebiten.Image) {
-	ebitenutil.DrawRect(
-		screen,
+	/*
+		ebitenutil.DrawRect(
+			screen,
+			float64(l.goalX*globAreaCellSize+globAreaPositionX),
+			float64(l.goalY*globAreaCellSize+globAreaPositionY),
+			float64(globAreaCellSize),
+			float64(globAreaCellSize),
+			color.RGBA{155, 55, 55, 255},
+		)
+	*/
+	options := ebiten.DrawImageOptions{}
+	options.GeoM.Translate(
 		float64(l.goalX*globAreaCellSize+globAreaPositionX),
 		float64(l.goalY*globAreaCellSize+globAreaPositionY),
-		float64(globAreaCellSize),
-		float64(globAreaCellSize),
-		color.RGBA{155, 55, 55, 255},
 	)
+	screen.DrawImage(imageGoal, &options)
 }
 
 func (l level) DrawSelected(screen *ebiten.Image) {
-	ebitenutil.DrawRect(
-		screen,
+	/*
+		ebitenutil.DrawRect(
+			screen,
+			float64(l.movable[l.selected].posX*globAreaCellSize+globAreaPositionX),
+			float64(l.movable[l.selected].posY*globAreaCellSize+globAreaPositionY),
+			float64(globAreaCellSize),
+			float64(globAreaCellSize),
+			color.RGBA{255, 255, 255, 255},
+		)
+	*/
+	options := ebiten.DrawImageOptions{}
+	options.GeoM.Translate(
 		float64(l.movable[l.selected].posX*globAreaCellSize+globAreaPositionX),
 		float64(l.movable[l.selected].posY*globAreaCellSize+globAreaPositionY),
-		float64(globAreaCellSize),
-		float64(globAreaCellSize),
-		color.RGBA{255, 255, 255, 255},
 	)
+	screen.DrawImage(imageSelect, &options)
 }
 
 func (g *Game) UpdateLevel() {
