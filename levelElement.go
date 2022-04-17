@@ -23,9 +23,10 @@ import (
 )
 
 type levelElement struct {
-	elementType int
-	posX        int
-	posY        int
+	elementType           int
+	posX                  int
+	posY                  int
+	doNotMoveInGeneration bool
 }
 
 const (

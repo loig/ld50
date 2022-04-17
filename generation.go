@@ -467,9 +467,14 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 		}
 	}
 
+	maxNumMoving := globNumMoving
+
 	// add a few scorpions
 	if withScorpions {
-		numScorpions := rand.Intn(globNumScorpions) + 1
+		numScorpions := rand.Intn(globNumScorpions + 1)
+		if numScorpions > maxNumMoving {
+			numScorpions = maxNumMoving
+		}
 		for numScorpions > 0 {
 			if rand.Intn(2) == 0 {
 				// on path
@@ -484,6 +489,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 									posX:        j,
 									posY:        i,
 								}
+								maxNumMoving--
 								break OneScorpionLoopA
 							}
 							pos--
@@ -506,6 +512,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 									posX:        j,
 									posY:        i,
 								}
+								maxNumMoving--
 								break OneScorpionLoopB
 							}
 							pos--
@@ -520,6 +527,9 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 	// add a few snakes to replace some cactus
 	if withSnakes {
 		numSnakes := rand.Intn(globNumSnakes) + 1
+		if numSnakes > maxNumMoving {
+			numSnakes = maxNumMoving
+		}
 		for numSnakes > 0 {
 			pos := rand.Intn(numCactus)
 		OneSnakeLoop:
@@ -544,7 +554,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 	// move snakes
 	for i := 0; i < len(l.area); i++ {
 		for j := 0; j < len(l.area[i]); j++ {
-			if l.area[i][j] != nil && l.area[i][j].elementType == snakeType {
+			if l.area[i][j] != nil && l.area[i][j].elementType == snakeType && !l.area[i][j].doNotMoveInGeneration {
 				directions := make([]int, 0) // 0 up, 1 right, 2 down, 3 left
 				// possible to move snake down or up
 				if i > 0 && i < len(l.area)-1 {
@@ -606,6 +616,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 					l.area[y][x] = l.area[i][j]
 					l.area[y][x].posX = x
 					l.area[y][x].posY = y
+					l.area[y][x].doNotMoveInGeneration = true
 					l.area[i][j] = nil
 				}
 			}
