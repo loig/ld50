@@ -49,4 +49,5 @@ const (
 	globNumWater         = 1
 	globProbaWaterOnPath = 8
 	globProbaFoodOnPath  = 8
+	globProbaMoveSnake   = 3
 )

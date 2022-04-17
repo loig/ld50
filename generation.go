@@ -497,7 +497,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 				for i := 0; i < len(path); i++ {
 					for j := 0; j < len(path[0]); j++ {
 						if (path[i][j] || isFree(i, j)) && (j != mid || (i != 0 && i != len(path)-1)) {
-							if pos == 0 {
+							if pos == 0 && l.area[i][j] == nil {
 								if isFree(i, j) {
 									numFree--
 								}
@@ -545,7 +545,69 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 	for i := 0; i < len(l.area); i++ {
 		for j := 0; j < len(l.area[i]); j++ {
 			if l.area[i][j] != nil && l.area[i][j].elementType == snakeType {
+				directions := make([]int, 0) // 0 up, 1 right, 2 down, 3 left
+				// possible to move snake down or up
+				if i > 0 && i < len(l.area)-1 {
+					if l.area[i-1][j] == nil && l.area[i+1][j] == nil {
+						// down
+						if !path[i-1][j] {
+							directions = append(directions, 2)
+						}
+						// up
+						if !path[i+1][j] {
+							directions = append(directions, 0)
+						}
+					}
+				}
+				// possible to move snake left or right
+				if j > 0 && j < len(l.area[0])-1 {
+					if l.area[i][j-1] == nil && l.area[i][j+1] == nil {
+						// left
+						if !path[i][j+1] {
+							directions = append(directions, 3)
+						}
+						if !path[i][j-1] {
+							directions = append(directions, 1)
+						}
+					}
+				}
 
+				// choose direction
+				if len(directions) > 0 {
+					dirId := rand.Intn(len(directions))
+					xmod := 0
+					ymod := 0
+					switch directions[dirId] {
+					case 0:
+						ymod = -1
+					case 1:
+						xmod = 1
+					case 2:
+						ymod = 1
+					case 3:
+						xmod = -1
+					}
+					// put a cactus to stop the snake
+					l.area[i-ymod][j-xmod] = &levelElement{
+						elementType: cactusType,
+						posX:        j - xmod,
+						posY:        i - ymod,
+					}
+					// move the snake
+					x := j + xmod
+					y := i + ymod
+					for rand.Intn(globProbaMoveSnake) == 0 &&
+						x+xmod >= 0 && x+xmod < len(l.area[0]) &&
+						y+ymod >= 0 && y+ymod < len(l.area) &&
+						l.area[y+ymod][x+xmod] == nil {
+						x += xmod
+						y += ymod
+					}
+					l.area[y][x] = l.area[i][j]
+					l.area[y][x].posX = x
+					l.area[y][x].posY = y
+					l.area[i][j] = nil
+				}
 			}
 		}
 	}
