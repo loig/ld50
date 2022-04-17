@@ -29,7 +29,9 @@ func initGame() *Game {
 	return &g
 }
 
-func (g *Game) NextLevel() {
-	g.hud.NextLevel()
+func (g *Game) NextLevel(skip bool) {
+	if !skip {
+		g.hud.NextLevel()
+	}
 	g.level = initLevel(globLevelX, globLevelY, true, true, true, true)
 }

@@ -17,6 +17,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"image/color"
@@ -29,6 +30,7 @@ type hud struct {
 	waterStep int
 	waterMax  int
 	levelNum  int
+	score     int
 }
 
 func initHud() (h hud) {
@@ -42,6 +44,7 @@ func initHud() (h hud) {
 }
 
 func (h *hud) NextLevel() {
+	h.score += (h.water * h.life * h.levelNum) / 100
 	h.levelNum++
 	h.water = h.waterMax
 }
@@ -82,6 +85,10 @@ func (h hud) Draw(screen *ebiten.Image) {
 
 	h.DrawWater(screen)
 
+	h.DrawLevelNum(screen)
+
+	//h.DrawScore(screen)
+
 }
 
 func (h hud) DrawLife(screen *ebiten.Image) {
@@ -106,4 +113,12 @@ func (h hud) DrawWater(screen *ebiten.Image) {
 		float64(globWaterHeight),
 		color.RGBA{0, 255, 255, 255},
 	)
+}
+
+func (h hud) DrawLevelNum(screen *ebiten.Image) {
+	ebitenutil.DebugPrintAt(screen, fmt.Sprint("Level ", h.levelNum), globLevelNumPosX, globLevelNumPosY)
+}
+
+func (h hud) DrawScore(screen *ebiten.Image) {
+	ebitenutil.DebugPrintAt(screen, fmt.Sprint("Score: ", h.score), globScorePosX, globScorePosY)
 }

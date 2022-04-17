@@ -17,29 +17,31 @@
 package main
 
 const (
-	globScreenWidth      = 800
-	globScreenHeight     = 600
+	globScreenWidth      = 117
+	globScreenHeight     = 117
+	globWindowWidth      = globScreenWidth * 8
+	globWindowHeight     = globScreenHeight * 8
 	globTitle            = "ld50"
-	globAreaPositionX    = 0
-	globAreaPositionY    = 0
-	globAreaCellSize     = 20
+	globAreaCellSize     = 9
+	globLevelX           = 11
+	globLevelY           = 8
+	globAreaPositionX    = (globScreenWidth - globLevelX*globAreaCellSize) / 2
+	globAreaPositionY    = (globScreenHeight - globLevelY*globAreaCellSize) / 2
 	globMoveLeft         = 0
 	globMoveUp           = 1
 	globMoveRight        = 2
 	globMoveDown         = 3
-	globLifePositionX    = 0
-	globLifePositionY    = 300
-	globLifeSize         = 30
-	globLifeSep          = 10
-	globWaterPositionX   = 0
-	globWaterPositionY   = 400
-	globWaterWidth       = 250
-	globWaterHeight      = 10
-	globWaterSep         = 10
+	globLifeSize         = 9
+	globLifePositionX    = globAreaPositionX
+	globLifePositionY    = globScreenHeight - (globAreaPositionY+globLifeSize)/2
+	globLifeSep          = 2
+	globWaterHeight      = globLifeSize
+	globWaterWidth       = 60
+	globWaterPositionX   = globAreaPositionX + globAreaCellSize*globLevelX - globWaterWidth
+	globWaterPositionY   = globScreenHeight - (globAreaPositionY+globWaterHeight)/2
+	globWaterSep         = 2
 	globWaterDrink       = 25
 	globNumSteps         = 5
-	globLevelX           = 11
-	globLevelY           = 8
 	globXDivider         = 3
 	globYDivider         = 2
 	globNumCactus        = 6
@@ -51,4 +53,8 @@ const (
 	globProbaFoodOnPath  = 8
 	globProbaMoveSnake   = 3
 	globNumMoving        = 3
+	globLevelNumPosX     = globAreaPositionX
+	globLevelNumPosY     = 0
+	globScorePosX        = 0
+	globScorePosY        = 0
 )

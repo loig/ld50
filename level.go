@@ -67,7 +67,12 @@ func initLevel(sizeX, sizeY int, withSnakes, withScorpions, withFood, withWater 
 	return
 }
 
-func (l *level) Update() (hurt, food, water, finished bool) {
+func (l *level) Update() (hurt, food, water, finished, skip bool) {
+
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		skip = true
+		return
+	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
 		l.ChangeSelected()

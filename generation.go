@@ -17,7 +17,7 @@
 package main
 
 import (
-	"log"
+	//"log"
 	"math/rand"
 )
 
@@ -42,11 +42,11 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 			}
 		}
 	}
-	log.Print(
-		"steps: ", numSteps,
-		"\nleft-right: ", numLeftRight,
-		"\nup-down: ", numUpDown,
-	)
+	//log.Print(
+	//	"steps: ", numSteps,
+	//	"\nleft-right: ", numLeftRight,
+	//	"\nup-down: ", numUpDown,
+	//)
 
 	// gen a sequence of left/right positions according to the number of steps
 	// positions are not coordinates, they represent sets of x coordinates
@@ -67,7 +67,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 		possibleXPos = append(possibleXPos[:id], possibleXPos[id+1:]...)
 	}
 	xseq[numLeftRight] = xseq[0]
-	log.Print("left-right: ", xseq)
+	//log.Print("left-right: ", xseq)
 
 	// gen a sequence of up/down coordinates according to the number of steps
 	// positions are not coordinates, they represent sets of y coordinates
@@ -84,7 +84,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 		possibleYPos = append(possibleYPos[:id], possibleYPos[id+1:]...)
 	}
 	yseq[numUpDown] = 0
-	log.Print("up-down: ", yseq)
+	//log.Print("up-down: ", yseq)
 
 	// merge the two sequences of positions to get couples of positions (x,y)
 	xyseq := make([]posCuple, numSteps+1)
@@ -112,7 +112,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 		}
 	}
 
-	log.Print("everything: ", xyseq)
+	//log.Print("everything: ", xyseq)
 
 	// from positions, get coordinates
 	lastx := -1
@@ -151,7 +151,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 		}
 	}
 
-	log.Print("real coordinates: ", xyseq)
+	//log.Print("real coordinates: ", xyseq)
 
 	// put cactus (or water or food) according to the position sequence and the step sequence
 	numWater := rand.Intn(globNumWater) + 1
@@ -298,7 +298,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 		}
 	}
 
-	log.Print(hasCactus, possiblePos)
+	//log.Print(hasCactus, possiblePos)
 
 	if !hasCactus && len(possiblePos) > 0 {
 		choice := rand.Intn(len(possiblePos))
@@ -340,7 +340,7 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 		}
 	}
 
-	log.Print(hasCactus, possiblePos)
+	//log.Print(hasCactus, possiblePos)
 
 	if !hasCactus && len(possiblePos) > 0 {
 		choice := rand.Intn(len(possiblePos))
@@ -624,20 +624,22 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 	}
 
 	// for debug only
-	for i := 0; i < len(l.area); i++ {
-		for j := 0; j < len(l.area[0]); j++ {
-			if path[i][j] {
-				if l.area[i][j] == nil {
-					l.area[i][j] = &levelElement{
-						elementType: nilType,
-						posX:        j,
-						posY:        i,
+	/*
+		for i := 0; i < len(l.area); i++ {
+			for j := 0; j < len(l.area[0]); j++ {
+				if path[i][j] {
+					if l.area[i][j] == nil {
+						l.area[i][j] = &levelElement{
+							elementType: nilType,
+							posX:        j,
+							posY:        i,
+						}
+					} else {
+						log.Print("Warning, found ", l.area[i][j], " on path")
 					}
-				} else {
-					log.Print("Warning, found ", l.area[i][j], " on path")
 				}
 			}
 		}
-	}
+	*/
 
 }

@@ -24,7 +24,7 @@ import (
 func main() {
 
 	ebiten.SetWindowTitle(globTitle)
-	ebiten.SetWindowSize(globScreenWidth, globScreenHeight)
+	ebiten.SetWindowSize(globWindowWidth, globWindowHeight)
 
 	g := initGame()
 
