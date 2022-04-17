@@ -35,19 +35,17 @@ const (
 
 func initGame() *Game {
 	g := Game{}
-	g.level = initLevel(globLevelX, globLevelY, false, false, false, false)
 	g.hud = initHud()
 	return &g
 }
 
-func (g *Game) NextLevel(skip bool) {
+func (g *Game) NextLevel(skip, inTuto bool) {
 	if !skip {
-		g.hud.NextLevel()
+		g.hud.NextLevel(inTuto)
 	}
-	g.level = initLevel(globLevelX, globLevelY, true, true, true, true)
+	g.level = initLevel(globLevelX, globLevelY, inTuto, g.hud.levelNum)
 }
 
 func (g *Game) Reset() {
 	g.hud.Reset()
-	g.level = initLevel(globLevelX, globLevelY, false, false, false, false)
 }

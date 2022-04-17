@@ -28,3 +28,11 @@ func isAnyKeyJustPressed() bool {
 	}
 	return false
 }
+
+func (l *level) addElementAt(x, y int, etype int) {
+	l.area[y][x] = &levelElement{
+		elementType: etype,
+		posX:        x,
+		posY:        y,
+	}
+}

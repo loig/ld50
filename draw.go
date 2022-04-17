@@ -29,9 +29,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	case stepCredits:
 		g.DrawCredits(screen)
 	case stepTuto:
+		g.DrawTuto(screen)
 	case stepLevel:
-		g.level.Draw(screen)
-		g.hud.Draw(screen)
+		g.DrawLevel(screen)
 	case stepDead:
 		g.DrawDead(screen)
 	}

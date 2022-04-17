@@ -25,18 +25,9 @@ func (g *Game) Update() error {
 	case stepCredits:
 		g.UpdateCredits()
 	case stepTuto:
+		g.UpdateTuto()
 	case stepLevel:
-		hurt, food, water, finished, skip := g.level.Update()
-		if skip {
-			g.NextLevel(skip)
-		}
-		dead := g.hud.Update(hurt, food, water)
-		if dead {
-			g.step = stepDead
-		}
-		if finished {
-			g.NextLevel(false)
-		}
+		g.UpdateLevel()
 	case stepDead:
 		g.UpdateDead()
 	}

@@ -30,7 +30,7 @@ type hud struct {
 	waterStep int
 	waterMax  int
 	levelNum  int
-	score     int
+	//score     int
 }
 
 func initHud() (h hud) {
@@ -47,13 +47,16 @@ func (h *hud) Reset() {
 	h.levelNum = 1
 }
 
-func (h *hud) NextLevel() {
-	h.score += (h.water * h.life * h.levelNum) / 100
+func (h *hud) NextLevel(inTuto bool) {
+	//h.score += (h.water * h.life * h.levelNum) / 100
 	h.levelNum++
 	h.water = h.waterMax
+	if inTuto {
+		h.waterStep = 2
+	}
 }
 
-func (h *hud) Update(hurt, food, water bool) (dead bool) {
+func (h *hud) Update(hurt, food, water, infiniteWater bool) (dead bool) {
 	if hurt {
 		h.life--
 		if h.life < 0 {
@@ -67,10 +70,13 @@ func (h *hud) Update(hurt, food, water bool) (dead bool) {
 		}
 	}
 
-	h.water -= h.waterStep
-	if h.water < 0 {
-		h.water = 0
+	if !infiniteWater {
+		h.water -= h.waterStep
+		if h.water < 0 {
+			h.water = 0
+		}
 	}
+
 	if water {
 		h.water += globWaterDrink * h.waterMax / 100
 		if h.water > h.waterMax {
@@ -83,13 +89,13 @@ func (h *hud) Update(hurt, food, water bool) (dead bool) {
 	return
 }
 
-func (h hud) Draw(screen *ebiten.Image) {
+func (h hud) Draw(screen *ebiten.Image, inTuto bool) {
 
 	h.DrawLife(screen)
 
 	h.DrawWater(screen)
 
-	h.DrawLevelNum(screen)
+	h.DrawLevelNum(screen, inTuto)
 
 	//h.DrawScore(screen)
 
@@ -119,10 +125,18 @@ func (h hud) DrawWater(screen *ebiten.Image) {
 	)
 }
 
-func (h hud) DrawLevelNum(screen *ebiten.Image) {
-	ebitenutil.DebugPrintAt(screen, fmt.Sprint("Level ", h.levelNum), globLevelNumPosX, globLevelNumPosY)
+func (h hud) DrawLevelNum(screen *ebiten.Image, inTuto bool) {
+	if !inTuto {
+		ebitenutil.DebugPrintAt(screen, fmt.Sprint("Level ", h.levelNum), globLevelNumPosX, globLevelNumPosY)
+	} else {
+		for i, s := range tutoSteps[h.levelNum-1] {
+			ebitenutil.DebugPrintAt(screen, s, globLevelNumPosX, globLevelNumPosY-10*(len(tutoSteps[h.levelNum-1])-1-i)+2*(len(tutoSteps[h.levelNum-1])-1))
+		}
+	}
 }
 
+/*
 func (h hud) DrawScore(screen *ebiten.Image) {
 	ebitenutil.DebugPrintAt(screen, fmt.Sprint("Score: ", h.score), globScorePosX, globScorePosY)
 }
+*/

@@ -31,7 +31,8 @@ type level struct {
 	selected     int
 }
 
-func initLevel(sizeX, sizeY int, withSnakes, withScorpions, withFood, withWater bool) (l level) {
+func initLevel(sizeX, sizeY int, inTuto bool, levelNum int) (l level) {
+
 	l.area = make([][]*levelElement, sizeY)
 	for i := 0; i < sizeY; i++ {
 		l.area[i] = make([]*levelElement, sizeX)
@@ -45,8 +46,20 @@ func initLevel(sizeX, sizeY int, withSnakes, withScorpions, withFood, withWater 
 	l.goalX = persoX
 	l.goalY = 0
 
-	// gen level
-	l.GenArea(withSnakes, withScorpions, withFood, withWater)
+	if inTuto {
+
+		l.SetTutoArea(levelNum)
+
+	} else {
+
+		withSnakes := false
+		withScorpions := false
+		withFood := false
+		withWater := false
+
+		// gen level
+		l.GenArea(withSnakes, withScorpions, withFood, withWater)
+	}
 
 	l.movable = make([]*levelElement, 0)
 	var selectedPos int
@@ -67,14 +80,14 @@ func initLevel(sizeX, sizeY int, withSnakes, withScorpions, withFood, withWater 
 	return
 }
 
-func (l *level) Update() (hurt, food, water, finished, skip bool) {
+func (l *level) Update(allowTab bool) (hurt, food, water, finished, skip bool) {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		skip = true
 		return
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyTab) && allowTab {
 		l.ChangeSelected()
 		return
 	}
@@ -202,4 +215,23 @@ func (l level) DrawSelected(screen *ebiten.Image) {
 		float64(globAreaCellSize),
 		color.RGBA{255, 255, 255, 255},
 	)
+}
+
+func (g *Game) UpdateLevel() {
+	hurt, food, water, finished, skip := g.level.Update(true)
+	if skip {
+		g.NextLevel(skip, false)
+	}
+	dead := g.hud.Update(hurt, food, water, false)
+	if dead {
+		g.step = stepDead
+	}
+	if finished {
+		g.NextLevel(false, false)
+	}
+}
+
+func (g Game) DrawLevel(screen *ebiten.Image) {
+	g.level.Draw(screen)
+	g.hud.Draw(screen, false)
 }
