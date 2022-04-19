@@ -36,7 +36,7 @@ type hud struct {
 
 func initHud() (h hud) {
 	h.lifeMax = 3
-	h.waterMax = 150
+	h.waterMax = 1000
 	h.Reset()
 	return
 }

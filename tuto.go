@@ -48,7 +48,7 @@ var tutoSteps [][]string = [][]string{
 
 func (g *Game) UpdateTuto() {
 	if g.subStep == tutoStepBase {
-		hurt, food, water, finished, skip, fromX, toX, fromY, toY, hasMoved := g.level.Update(g.hud.levelNum >= tutoLearnTabLevel)
+		hurt, food, water, finished, skip, fromX, toX, fromY, toY, hasMoved, foodp, waterp := g.level.Update(g.hud.levelNum >= tutoLearnTabLevel)
 		if skip && g.hud.levelNum == len(tutoSteps) {
 			g.subStep = tutoStepDone
 		}
@@ -58,10 +58,10 @@ func (g *Game) UpdateTuto() {
 		if hasMoved {
 			g.AddParticlesOnGrid(fromX, fromY, toX, toY)
 		}
-		if water {
+		if waterp {
 			g.AddWaterFoodParticles(toX, toY, true)
 		}
-		if food {
+		if foodp {
 			g.AddWaterFoodParticles(toX, toY, false)
 		}
 		dead := g.hud.Update(hurt, food, water, g.hud.levelNum < tutoLearnDeathLevel)
