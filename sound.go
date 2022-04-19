@@ -45,6 +45,16 @@ func (g *Game) updateMusic() {
 		}
 		g.audio.musicPlayer.Play()
 	}
+	v := g.audio.musicPlayer.Volume()
+	if g.step == stepTitle || g.step == stepCredits {
+		if v < 1 {
+			g.audio.musicPlayer.SetVolume(v + 0.005)
+		}
+	} else {
+		if v > 0.2 {
+			g.audio.musicPlayer.SetVolume(v - 0.005)
+		}
+	}
 }
 
 // stop the music

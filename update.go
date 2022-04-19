@@ -50,6 +50,8 @@ func (g *Game) Update() error {
 		g.UpdateDead()
 	case stepLevelTransition:
 		g.UpdateLevelTransition()
+	case stepRank:
+		g.UpdateRank()
 	}
 
 	return nil

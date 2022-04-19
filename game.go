@@ -38,6 +38,9 @@ type Game struct {
 	particles        []*particle
 	lastAlive        int
 	audio            soundManager
+	therank          chan rank
+	finalrank        rank
+	name             [3]int
 }
 
 // Game steps
@@ -48,6 +51,7 @@ const (
 	stepLevel
 	stepLevelTransition
 	stepDead
+	stepRank
 )
 
 func initGame() *Game {
@@ -56,6 +60,7 @@ func initGame() *Game {
 	g.initAudio()
 	rand.Seed(time.Now().UnixNano())
 	g.lastAlive = -1
+	g.therank = make(chan rank, 1)
 	return &g
 }
 

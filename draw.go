@@ -39,6 +39,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	case stepLevelTransition:
 		g.DrawLevelTransition(screen)
 		g.DrawParticles(screen)
+	case stepRank:
+		g.DrawRank(screen)
 	}
 
 }
