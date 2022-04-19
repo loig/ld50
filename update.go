@@ -33,6 +33,8 @@ func (g *Game) Update() error {
 		}
 	}
 
+	g.UpdateParticles()
+
 	switch g.step {
 	case stepTitle:
 		g.UpdateTitle()

@@ -30,12 +30,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.DrawCredits(screen)
 	case stepTuto:
 		g.DrawTuto(screen)
+		g.DrawParticles(screen)
 	case stepLevel:
 		g.DrawLevel(screen)
+		g.DrawParticles(screen)
 	case stepDead:
 		g.DrawDead(screen)
 	case stepLevelTransition:
 		g.DrawLevelTransition(screen)
+		g.DrawParticles(screen)
 	}
 
 }

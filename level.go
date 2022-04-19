@@ -56,10 +56,10 @@ func initLevel(sizeX, sizeY int, inTuto bool, levelNum int) (l level) {
 
 	} else {
 
-		withSnakes := false
-		withScorpions := false
-		withFood := false
-		withWater := false
+		withSnakes := levelNum > globLevelUnlockSnake
+		withScorpions := levelNum > globLevelUnlockScorpion
+		withWater := levelNum > globLevelUnlockWater
+		withFood := withWater && (withSnakes || withScorpions)
 
 		// gen level
 		l.GenArea(withSnakes, withScorpions, withFood, withWater)
@@ -84,7 +84,7 @@ func initLevel(sizeX, sizeY int, inTuto bool, levelNum int) (l level) {
 	return
 }
 
-func (l *level) Update(allowTab bool) (hurt, food, water, finished, skip bool) {
+func (l *level) Update(allowTab bool) (hurt, food, water, finished, skip bool, fromX, toX, fromY, toY int, hasMoved bool) {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		skip = true
@@ -97,13 +97,17 @@ func (l *level) Update(allowTab bool) (hurt, food, water, finished, skip bool) {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		hurt, food, water = l.MoveSelected(globMoveLeft)
+		hasMoved = true
+		hurt, food, water, fromX, toX, fromY, toY = l.MoveSelected(globMoveLeft)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		hurt, food, water = l.MoveSelected(globMoveRight)
+		hasMoved = true
+		hurt, food, water, fromX, toX, fromY, toY = l.MoveSelected(globMoveRight)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		hurt, food, water = l.MoveSelected(globMoveUp)
+		hasMoved = true
+		hurt, food, water, fromX, toX, fromY, toY = l.MoveSelected(globMoveUp)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		hurt, food, water = l.MoveSelected(globMoveDown)
+		hasMoved = true
+		hurt, food, water, fromX, toX, fromY, toY = l.MoveSelected(globMoveDown)
 	}
 
 	finished = l.perso.posX == l.goalX && l.perso.posY == l.goalY
@@ -115,7 +119,7 @@ func (l *level) ChangeSelected() {
 	l.selected = (l.selected + 1) % len(l.movable)
 }
 
-func (l *level) MoveSelected(direction int) (hurt, food, water bool) {
+func (l *level) MoveSelected(direction int) (hurt, food, water bool, fromX, toX, fromY, toY int) {
 	var moveX, moveY int
 	switch direction {
 	case globMoveUp:
@@ -133,6 +137,9 @@ func (l *level) MoveSelected(direction int) (hurt, food, water bool) {
 	toMove := l.movable[l.selected]
 	i := toMove.posY
 	j := toMove.posX
+
+	fromX = toMove.posX
+	fromY = toMove.posY
 
 	i += moveY
 	j += moveX
@@ -165,6 +172,9 @@ func (l *level) MoveSelected(direction int) (hurt, food, water bool) {
 
 	toMove.posX = j
 	toMove.posY = i
+
+	toX = toMove.posX
+	toY = toMove.posY
 
 	l.area[i][j] = toMove
 
@@ -268,12 +278,21 @@ func (l level) DrawSelected(screen *ebiten.Image, alpha float64) {
 }
 
 func (g *Game) UpdateLevel() {
-	hurt, food, water, finished, skip := g.level.Update(true)
+	hurt, food, water, finished, skip, fromX, toX, fromY, toY, hasMoved := g.level.Update(true)
 	if skip {
 		g.NextLevel(skip, false)
 	}
 	if hurt {
 		g.cameraShake = true
+	}
+	if hasMoved {
+		g.AddParticlesOnGrid(fromX, fromY, toX, toY)
+	}
+	if water {
+		g.AddWaterFoodParticles(toX, toY, true)
+	}
+	if food {
+		g.AddWaterFoodParticles(toX, toY, false)
 	}
 	dead := g.hud.Update(hurt, food, water, false)
 	if dead {

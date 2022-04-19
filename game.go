@@ -16,6 +16,11 @@
 */
 package main
 
+import (
+	"math/rand"
+	"time"
+)
+
 // Game implements the Game interface from ebiten
 type Game struct {
 	step             int
@@ -30,6 +35,8 @@ type Game struct {
 	inTuto           bool
 	cameraShake      bool
 	cameraShakeFrame int
+	particles        []*particle
+	lastAlive        int
 }
 
 // Game steps
@@ -45,6 +52,8 @@ const (
 func initGame() *Game {
 	g := Game{}
 	g.hud = initHud()
+	rand.Seed(time.Now().UnixNano())
+	g.lastAlive = -1
 	return &g
 }
 

@@ -46,6 +46,8 @@ var imageWater *ebiten.Image
 var imageDesert [2]*ebiten.Image
 var imageWaterBar [2]*ebiten.Image
 
+var imageParticle *ebiten.Image
+
 func loadAssets() {
 	var err error
 
@@ -79,4 +81,6 @@ func loadAssets() {
 	imageWaterBar[0] = spritesImage.SubImage(image.Rect(0, 27, 45, 36)).(*ebiten.Image)
 	imageWaterBar[1] = spritesImage.SubImage(image.Rect(0, 36, 45, 45)).(*ebiten.Image)
 	imageWater = spritesImage.SubImage(image.Rect(18, 18, 27, 27)).(*ebiten.Image)
+
+	imageParticle = spritesImage.SubImage(image.Rect(45, 18, 48, 21)).(*ebiten.Image)
 }
