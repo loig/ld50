@@ -472,6 +472,9 @@ func (l *level) GenArea(withSnakes, withScorpions, withFood, withWater bool) {
 	// add a few scorpions
 	if withScorpions {
 		numScorpions := rand.Intn(globNumScorpions + 1)
+		if !withSnakes && numScorpions == 0 {
+			numScorpions = 1
+		}
 		if numScorpions > maxNumMoving {
 			numScorpions = maxNumMoving
 		}

@@ -36,7 +36,7 @@ type hud struct {
 
 func initHud() (h hud) {
 	h.lifeMax = 3
-	h.waterMax = 1000
+	h.waterMax = 150
 	h.Reset()
 	return
 }
@@ -51,6 +51,9 @@ func (h *hud) Reset() {
 func (h *hud) NextLevel(inTuto bool) {
 	//h.score += (h.water * h.life * h.levelNum) / 100
 	h.levelNum++
+	if h.waterMax > 150 {
+		h.waterMax -= 10
+	}
 	h.water = h.waterMax
 	if inTuto {
 		h.waterStep = 2
