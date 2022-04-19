@@ -63,8 +63,8 @@ func (h *hud) NextLevel(inTuto bool) {
 func (h *hud) Update(hurt, food, water, infiniteWater bool) (dead bool) {
 	if hurt {
 		h.life--
-		if h.life < -1 {
-			h.life = -1
+		if h.life < 0 {
+			h.life = 0
 		}
 	}
 	if food {
@@ -88,7 +88,7 @@ func (h *hud) Update(hurt, food, water, infiniteWater bool) (dead bool) {
 		}
 	}
 
-	dead = h.life < 0 || h.water <= 0
+	dead = h.life <= 0 || h.water <= 0
 
 	return
 }

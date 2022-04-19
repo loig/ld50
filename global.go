@@ -62,7 +62,7 @@ const (
 	globNumFramesTransStep1   = 50
 	globNumFramesTransStep2   = 40
 	globNumCamShakeFrames     = 10
-	globShakeAmplitude        = 5
+	globShakeAmplitude        = 3
 	globParticleLifespan      = 30
 	globMaxNumParticles       = 5
 	globNumWaterParticles     = 4

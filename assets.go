@@ -20,6 +20,7 @@ import (
 	"bytes"
 	_ "embed"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"image"
 	_ "image/png"
 	"log"
@@ -28,6 +29,10 @@ import (
 //go:embed title.png
 var titleBytes []byte
 var titleImage *ebiten.Image
+
+//go:embed thirst.mp3
+var music []byte
+var infiniteMusic *audio.InfiniteLoop
 
 //go:embed sprites.png
 var spritesBytes []byte

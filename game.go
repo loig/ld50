@@ -37,6 +37,7 @@ type Game struct {
 	cameraShakeFrame int
 	particles        []*particle
 	lastAlive        int
+	audio            soundManager
 }
 
 // Game steps
@@ -52,6 +53,7 @@ const (
 func initGame() *Game {
 	g := Game{}
 	g.hud = initHud()
+	g.initAudio()
 	rand.Seed(time.Now().UnixNano())
 	g.lastAlive = -1
 	return &g
