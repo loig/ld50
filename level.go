@@ -21,6 +21,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"image/color"
+	"math/rand"
 )
 
 type level struct {
@@ -29,9 +30,12 @@ type level struct {
 	perso        *levelElement
 	goalX, goalY int
 	selected     int
+	num          int
 }
 
 func initLevel(sizeX, sizeY int, inTuto bool, levelNum int) (l level) {
+
+	l.num = levelNum
 
 	l.area = make([][]*levelElement, sizeY)
 	for i := 0; i < sizeY; i++ {
@@ -167,46 +171,63 @@ func (l *level) MoveSelected(direction int) (hurt, food, water bool) {
 	return
 }
 
-func (l level) Draw(screen *ebiten.Image) {
+func (l level) Draw(screen *ebiten.Image, frame int, xshift, yshift int, alpha float64, inTransition bool) {
 
-	l.DrawBackground(screen)
+	l.DrawBackground(screen, xshift, yshift, inTransition)
 
-	l.DrawGoal(screen)
+	l.DrawGoal(screen, xshift, yshift, alpha)
 
-	l.DrawSelected(screen)
+	if !inTransition {
+		l.DrawSelected(screen, alpha)
+	}
 
 	for _, line := range l.area {
 		for _, element := range line {
 			if element != nil {
-				element.Draw(screen)
+				element.Draw(screen, frame, xshift, yshift, alpha)
 			}
 		}
 	}
 
 }
 
-func (l level) DrawBackground(screen *ebiten.Image) {
-	ebitenutil.DrawRect(
-		screen,
-		float64(globAreaPositionX),
-		float64(globAreaPositionY),
-		float64(globAreaCellSize*len(l.area[0])),
-		float64(globAreaCellSize*len(l.area)),
-		color.RGBA{55, 55, 55, 255},
-	)
+func (l level) DrawBackground(screen *ebiten.Image, xshift, yshift int, inTransition bool) {
+
 	for i := 0; i < len(l.area); i++ {
 		for j := 0; j < len(l.area[0]); j++ {
 			options := ebiten.DrawImageOptions{}
 			options.GeoM.Translate(
-				float64(j*globAreaCellSize+globAreaPositionX),
-				float64(i*globAreaCellSize+globAreaPositionY),
+				float64(j*globAreaCellSize+globAreaPositionX+xshift),
+				float64(i*globAreaCellSize+globAreaPositionY+yshift),
 			)
-			screen.DrawImage(imageDesert[(i*len(l.area[0])+j)%2], &options)
+			screen.DrawImage(imageDesert[(i*len(l.area[0])+j+l.num)%2], &options)
 		}
+	}
+
+	if inTransition && yshift < 0 {
+		ebitenutil.DrawRect(
+			screen,
+			float64(globAreaPositionX),
+			float64(0),
+			float64(globAreaCellSize*len(l.area[0])),
+			float64(globAreaPositionY),
+			color.RGBA{0, 0, 0, 255},
+		)
+	}
+
+	if inTransition && yshift > 0 {
+		ebitenutil.DrawRect(
+			screen,
+			float64(globAreaPositionX),
+			float64(globAreaPositionY+globAreaCellSize*len(l.area)),
+			float64(globAreaCellSize*len(l.area[0])),
+			float64(globScreenHeight),
+			color.RGBA{0, 0, 0, 255},
+		)
 	}
 }
 
-func (l level) DrawGoal(screen *ebiten.Image) {
+func (l level) DrawGoal(screen *ebiten.Image, xshift, yshift int, alpha float64) {
 	/*
 		ebitenutil.DrawRect(
 			screen,
@@ -219,13 +240,14 @@ func (l level) DrawGoal(screen *ebiten.Image) {
 	*/
 	options := ebiten.DrawImageOptions{}
 	options.GeoM.Translate(
-		float64(l.goalX*globAreaCellSize+globAreaPositionX),
-		float64(l.goalY*globAreaCellSize+globAreaPositionY),
+		float64(l.goalX*globAreaCellSize+globAreaPositionX+xshift),
+		float64(l.goalY*globAreaCellSize+globAreaPositionY+yshift),
 	)
+	options.ColorM.Scale(1, 1, 1, alpha)
 	screen.DrawImage(imageGoal, &options)
 }
 
-func (l level) DrawSelected(screen *ebiten.Image) {
+func (l level) DrawSelected(screen *ebiten.Image, alpha float64) {
 	/*
 		ebitenutil.DrawRect(
 			screen,
@@ -241,6 +263,7 @@ func (l level) DrawSelected(screen *ebiten.Image) {
 		float64(l.movable[l.selected].posX*globAreaCellSize+globAreaPositionX),
 		float64(l.movable[l.selected].posY*globAreaCellSize+globAreaPositionY),
 	)
+	options.ColorM.Scale(1, 1, 1, alpha)
 	screen.DrawImage(imageSelect, &options)
 }
 
@@ -249,16 +272,26 @@ func (g *Game) UpdateLevel() {
 	if skip {
 		g.NextLevel(skip, false)
 	}
+	if hurt {
+		g.cameraShake = true
+	}
 	dead := g.hud.Update(hurt, food, water, false)
 	if dead {
 		g.step = stepDead
 	}
 	if finished {
 		g.NextLevel(false, false)
+		g.step = stepLevelTransition
 	}
 }
 
 func (g Game) DrawLevel(screen *ebiten.Image) {
-	g.level.Draw(screen)
+	xshift := 0
+	yshift := 0
+	if g.cameraShake {
+		xshift = rand.Intn(globShakeAmplitude)
+		yshift = rand.Intn(globShakeAmplitude)
+	}
+	g.level.Draw(screen, g.animeFrame, xshift, yshift, 1, false)
 	g.hud.Draw(screen, false)
 }

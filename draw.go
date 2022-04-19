@@ -34,6 +34,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.DrawLevel(screen)
 	case stepDead:
 		g.DrawDead(screen)
+	case stepLevelTransition:
+		g.DrawLevelTransition(screen)
 	}
 
 }

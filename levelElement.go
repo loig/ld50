@@ -39,7 +39,7 @@ const (
 	foodType
 )
 
-func (e levelElement) Draw(screen *ebiten.Image) {
+func (e levelElement) Draw(screen *ebiten.Image, frame int, xshiftbase, yshiftbase int, alpha float64) {
 	if e.elementType != nilType {
 		//var c color.Color
 		var img *ebiten.Image
@@ -47,18 +47,19 @@ func (e levelElement) Draw(screen *ebiten.Image) {
 		switch e.elementType {
 		case persoType:
 			//c = color.RGBA{255, 0, 255, 255}
-			img = imagePerso[0]
+			img = imagePerso[frame]
 			yshift = -3
+			alpha = 1
 		case cactusType:
 			//c = color.RGBA{0, 255, 0, 255}
 			img = imageCactus
 			yshift = -4
 		case snakeType:
 			//c = color.RGBA{0, 0, 255, 255}
-			img = imageSnake[0]
+			img = imageSnake[frame]
 		case scorpionType:
 			//c = color.RGBA{255, 255, 0, 255}
-			img = imageScorpion[0]
+			img = imageScorpion[frame]
 		case waterType:
 			//c = color.RGBA{0, 255, 255, 255}
 			img = imageBottle
@@ -77,9 +78,10 @@ func (e levelElement) Draw(screen *ebiten.Image) {
 		*/
 		options := ebiten.DrawImageOptions{}
 		options.GeoM.Translate(
-			float64(e.posX*globAreaCellSize+globAreaPositionX+xshift),
-			float64(e.posY*globAreaCellSize+globAreaPositionY+yshift),
+			float64(e.posX*globAreaCellSize+globAreaPositionX+xshift+xshiftbase),
+			float64(e.posY*globAreaCellSize+globAreaPositionY+yshift+yshiftbase),
 		)
+		options.ColorM.Scale(1, 1, 1, alpha)
 		screen.DrawImage(img, &options)
 
 	} /*else {

@@ -19,6 +19,20 @@ package main
 // Update implements the Update method of the ebiten Game interface
 func (g *Game) Update() error {
 
+	g.animeStep++
+	if g.animeStep >= globNumAnimeSteps {
+		g.animeStep = 0
+		g.animeFrame = (g.animeFrame + 1) % 2
+	}
+
+	if g.cameraShake {
+		g.cameraShakeFrame++
+		if g.cameraShakeFrame >= globNumCamShakeFrames {
+			g.cameraShake = false
+			g.cameraShakeFrame = 0
+		}
+	}
+
 	switch g.step {
 	case stepTitle:
 		g.UpdateTitle()
@@ -30,6 +44,8 @@ func (g *Game) Update() error {
 		g.UpdateLevel()
 	case stepDead:
 		g.UpdateDead()
+	case stepLevelTransition:
+		g.UpdateLevelTransition()
 	}
 
 	return nil

@@ -19,6 +19,7 @@ package main
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"math/rand"
 )
 
 const (
@@ -51,12 +52,16 @@ func (g *Game) UpdateTuto() {
 		if skip && g.hud.levelNum == len(tutoSteps) {
 			g.subStep = tutoStepDone
 		}
+		if hurt {
+			g.cameraShake = true
+		}
 		dead := g.hud.Update(hurt, food, water, g.hud.levelNum < tutoLearnDeathLevel)
 		if dead {
 			g.subStep = tutoStepDead
 		}
 		if finished {
 			g.NextLevel(false, true)
+			g.step = stepLevelTransition
 		}
 		return
 	}
@@ -76,13 +81,20 @@ func (g *Game) UpdateTuto() {
 	if isAnyKeyJustPressed() {
 		g.subStep = 0
 		g.step = stepTitle
+		g.inTuto = false
 		g.Reset()
 	}
 }
 
 func (g Game) DrawTuto(screen *ebiten.Image) {
 	if g.subStep == tutoStepBase {
-		g.level.Draw(screen)
+		xshift := 0
+		yshift := 0
+		if g.cameraShake {
+			xshift = rand.Intn(globShakeAmplitude)
+			yshift = rand.Intn(globShakeAmplitude)
+		}
+		g.level.Draw(screen, g.animeFrame, xshift, yshift, 1, false)
 		g.hud.Draw(screen, true)
 	} else if g.subStep == tutoStepDead {
 		ebitenutil.DebugPrintAt(screen, "You died!", 30, 30)

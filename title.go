@@ -35,6 +35,7 @@ func (g *Game) UpdateTitle() {
 			g.level = initLevel(globLevelX, globLevelY, false, 1)
 		case 1:
 			g.step = stepTuto
+			g.inTuto = true
 			g.level = initLevel(globLevelX, globLevelY, true, 1)
 		case 2:
 			g.step = stepCredits

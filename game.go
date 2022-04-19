@@ -18,10 +18,18 @@ package main
 
 // Game implements the Game interface from ebiten
 type Game struct {
-	step    int
-	subStep int
-	level   level
-	hud     hud
+	step             int
+	subStep          int
+	previousLevel    level
+	level            level
+	hud              hud
+	animeFrame       int
+	animeStep        int
+	transitionFrame  int
+	transitionStep   int
+	inTuto           bool
+	cameraShake      bool
+	cameraShakeFrame int
 }
 
 // Game steps
@@ -30,6 +38,7 @@ const (
 	stepCredits
 	stepTuto
 	stepLevel
+	stepLevelTransition
 	stepDead
 )
 
@@ -43,6 +52,7 @@ func (g *Game) NextLevel(skip, inTuto bool) {
 	if !skip {
 		g.hud.NextLevel(inTuto)
 	}
+	g.previousLevel = g.level
 	g.level = initLevel(globLevelX, globLevelY, inTuto, g.hud.levelNum)
 }
 
