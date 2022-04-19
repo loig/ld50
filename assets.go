@@ -25,6 +25,10 @@ import (
 	"log"
 )
 
+//go:embed title.png
+var titleBytes []byte
+var titleImage *ebiten.Image
+
 //go:embed sprites.png
 var spritesBytes []byte
 var spritesImage *ebiten.Image
@@ -44,6 +48,13 @@ var imageWaterBar [2]*ebiten.Image
 
 func loadAssets() {
 	var err error
+
+	titleDecoded, _, err := image.Decode(bytes.NewReader(titleBytes))
+	if err != nil {
+		log.Fatal(err)
+	}
+	titleImage = ebiten.NewImageFromImage(titleDecoded)
+
 	spritesDecoded, _, err := image.Decode(bytes.NewReader(spritesBytes))
 	if err != nil {
 		log.Fatal(err)

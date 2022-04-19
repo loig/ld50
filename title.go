@@ -47,10 +47,23 @@ func (g *Game) UpdateTitle() {
 
 func (g *Game) DrawTitle(screen *ebiten.Image) {
 
-	ebitenutil.DebugPrintAt(screen, "Play", 45, globScreenHeight/2)
-	ebitenutil.DebugPrintAt(screen, "Learn", 45, globScreenHeight/2+12)
-	ebitenutil.DebugPrintAt(screen, "About", 45, globScreenHeight/2+24)
+	options := ebiten.DrawImageOptions{}
+	options.GeoM.Translate(
+		0,
+		-5,
+	)
+	screen.DrawImage(titleImage, &options)
 
-	ebitenutil.DebugPrintAt(screen, "o", 35, globScreenHeight/2+12*g.subStep-1)
+	ebitenutil.DebugPrintAt(screen, "Play", 45, globScreenHeight/2+10)
+	ebitenutil.DebugPrintAt(screen, "Learn", 45, globScreenHeight/2+22)
+	ebitenutil.DebugPrintAt(screen, "About", 45, globScreenHeight/2+34)
+
+	options = ebiten.DrawImageOptions{}
+	options.GeoM.Translate(
+		33,
+		float64(globScreenHeight/2+12*g.subStep-1+15),
+	)
+	screen.DrawImage(imageFood, &options)
+	//ebitenutil.DebugPrintAt(screen, "o", 35, globScreenHeight/2+12*g.subStep-1+10)
 
 }
