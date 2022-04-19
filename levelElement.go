@@ -39,7 +39,7 @@ const (
 	foodType
 )
 
-func (e levelElement) Draw(screen *ebiten.Image, frame int, xshiftbase, yshiftbase int, alpha float64) {
+func (e levelElement) Draw(screen *ebiten.Image, frame int, xshiftbase, yshiftbase int, alpha float64, inDeath bool) {
 	if e.elementType != nilType {
 		//var c color.Color
 		var img *ebiten.Image
@@ -50,6 +50,10 @@ func (e levelElement) Draw(screen *ebiten.Image, frame int, xshiftbase, yshiftba
 			img = imagePerso[frame]
 			yshift = -3
 			alpha = 1
+			if inDeath {
+				img = imageDead
+				yshift = 0
+			}
 		case cactusType:
 			//c = color.RGBA{0, 255, 0, 255}
 			img = imageCactus

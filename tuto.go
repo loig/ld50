@@ -24,7 +24,7 @@ import (
 
 const (
 	tutoStepBase int = iota
-	tutoStepDead
+	//tutoStepDead
 	tutoStepDone
 )
 
@@ -66,7 +66,8 @@ func (g *Game) UpdateTuto() {
 		}
 		dead := g.hud.Update(hurt, food, water, g.hud.levelNum < tutoLearnDeathLevel)
 		if dead {
-			g.subStep = tutoStepDead
+			//g.subStep = tutoStepDead
+			g.step = stepDead
 		}
 		if finished {
 			g.NextLevel(false, true)
@@ -75,17 +76,19 @@ func (g *Game) UpdateTuto() {
 		return
 	}
 
-	if g.subStep == tutoStepDead {
-		if isAnyKeyJustPressed() {
-			g.subStep = tutoStepBase
-			if g.hud.levelNum != tutoLearnDeathLevel {
-				g.hud.levelNum--
-				g.hud.life = g.hud.lifeMax
+	/*
+		if g.subStep == tutoStepDead {
+			if isAnyKeyJustPressed() {
+				g.subStep = tutoStepBase
+				if g.hud.levelNum != tutoLearnDeathLevel {
+					g.hud.levelNum--
+					g.hud.life = g.hud.lifeMax
+				}
+				g.NextLevel(false, true)
 			}
-			g.NextLevel(false, true)
+			return
 		}
-		return
-	}
+	*/
 
 	if isAnyKeyJustPressed() {
 		g.subStep = 0
@@ -103,12 +106,12 @@ func (g Game) DrawTuto(screen *ebiten.Image) {
 			xshift = rand.Intn(globShakeAmplitude)
 			yshift = rand.Intn(globShakeAmplitude)
 		}
-		g.level.Draw(screen, g.animeFrame, xshift, yshift, 1, false)
-		g.hud.Draw(screen, true)
-	} else if g.subStep == tutoStepDead {
-		ebitenutil.DebugPrintAt(screen, "You died!", 30, 30)
-		ebitenutil.DebugPrintAt(screen, "But it's fine", 20, 45)
-		ebitenutil.DebugPrintAt(screen, "Press any key", 20, 60)
+		g.level.Draw(screen, g.animeFrame, xshift, yshift, 1, false, false)
+		g.hud.Draw(screen, true, false, false)
+		/*	} else if g.subStep == tutoStepDead {
+			ebitenutil.DebugPrintAt(screen, "You died!", 30, 30)
+			ebitenutil.DebugPrintAt(screen, "But it's fine", 20, 45)
+			ebitenutil.DebugPrintAt(screen, "Press any key", 20, 60)*/
 	} else {
 		ebitenutil.DebugPrintAt(screen, "Congrats!", 30, 15)
 		ebitenutil.DebugPrintAt(screen, "Let's play", 25, 35)

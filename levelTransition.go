@@ -50,12 +50,12 @@ func (g *Game) UpdateLevelTransition() {
 
 func (g *Game) DrawLevelTransition(screen *ebiten.Image) {
 	if g.transitionStep == 0 {
-		g.previousLevel.Draw(screen, g.animeFrame, 0, 0, 1-float64(g.transitionFrame)/float64(globNumFramesTransStep0), true)
+		g.previousLevel.Draw(screen, g.animeFrame, 0, 0, 1-float64(g.transitionFrame)/float64(globNumFramesTransStep0), true, false)
 	} else if g.transitionStep == 1 {
 		yshift := ((globLevelY - 1) * globAreaCellSize * g.transitionFrame) / globNumFramesTransStep1
-		g.level.Draw(screen, g.animeFrame, 0, yshift-(globLevelY-1)*globAreaCellSize, 0, true)
-		g.previousLevel.Draw(screen, g.animeFrame, 0, yshift, 0, true)
+		g.level.Draw(screen, g.animeFrame, 0, yshift-(globLevelY-1)*globAreaCellSize, 0, true, false)
+		g.previousLevel.Draw(screen, g.animeFrame, 0, yshift, 0, true, false)
 	} else {
-		g.level.Draw(screen, g.animeFrame, 0, 0, 1*float64(g.transitionFrame)/float64(globNumFramesTransStep2), true)
+		g.level.Draw(screen, g.animeFrame, 0, 0, 1*float64(g.transitionFrame)/float64(globNumFramesTransStep2), true, false)
 	}
 }

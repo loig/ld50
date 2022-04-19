@@ -93,13 +93,13 @@ func (h *hud) Update(hurt, food, water, infiniteWater bool) (dead bool) {
 	return
 }
 
-func (h hud) Draw(screen *ebiten.Image, inTuto bool) {
+func (h hud) Draw(screen *ebiten.Image, inTuto, inDeath, deathDone bool) {
 
 	h.DrawLife(screen)
 
 	h.DrawWater(screen)
 
-	h.DrawLevelNum(screen, inTuto)
+	h.DrawLevelNum(screen, inTuto, inDeath, deathDone)
 
 	//h.DrawScore(screen)
 
@@ -156,12 +156,26 @@ func (h hud) DrawWater(screen *ebiten.Image) {
 	screen.DrawImage(imageWaterBar[0].SubImage(image.Rect(0, 27, (45*h.water)/h.waterMax, 36)).(*ebiten.Image), &options)
 }
 
-func (h hud) DrawLevelNum(screen *ebiten.Image, inTuto bool) {
+func (h hud) DrawLevelNum(screen *ebiten.Image, inTuto, inDeath, deathDone bool) {
 	if !inTuto {
-		ebitenutil.DebugPrintAt(screen, fmt.Sprint("Level ", h.levelNum), globLevelNumPosX, globLevelNumPosY)
+		if inDeath {
+			ebitenutil.DebugPrintAt(screen, "You died!", globLevelNumPosX, globLevelNumPosY-8)
+			if deathDone {
+				ebitenutil.DebugPrintAt(screen, fmt.Sprint("(at level ", h.levelNum, ")"), globLevelNumPosX, globLevelNumPosY+2)
+			}
+		} else {
+			ebitenutil.DebugPrintAt(screen, fmt.Sprint("Level ", h.levelNum), globLevelNumPosX, globLevelNumPosY)
+		}
 	} else {
-		for i, s := range tutoSteps[h.levelNum-1] {
-			ebitenutil.DebugPrintAt(screen, s, globLevelNumPosX, globLevelNumPosY-10*(len(tutoSteps[h.levelNum-1])-1-i)+2*(len(tutoSteps[h.levelNum-1])-1))
+		if inDeath {
+			ebitenutil.DebugPrintAt(screen, "You died!", globLevelNumPosX, globLevelNumPosY-8)
+			if deathDone {
+				ebitenutil.DebugPrintAt(screen, "Press any key", globLevelNumPosX, globLevelNumPosY+2)
+			}
+		} else {
+			for i, s := range tutoSteps[h.levelNum-1] {
+				ebitenutil.DebugPrintAt(screen, s, globLevelNumPosX, globLevelNumPosY-10*(len(tutoSteps[h.levelNum-1])-1-i)+2*(len(tutoSteps[h.levelNum-1])-1))
+			}
 		}
 	}
 }

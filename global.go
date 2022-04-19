@@ -70,4 +70,6 @@ const (
 	globLevelUnlockWater      = 5
 	globLevelUnlockScorpion   = 10
 	globLevelUnlockSnake      = 15
+	globDeadStep0Frames       = 20
+	globDeadStep1Frames       = 80
 )

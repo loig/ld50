@@ -183,27 +183,31 @@ func (l *level) MoveSelected(direction int) (hurt, food, water bool, fromX, toX,
 	return
 }
 
-func (l level) Draw(screen *ebiten.Image, frame int, xshift, yshift int, alpha float64, inTransition bool) {
+func (l level) Draw(screen *ebiten.Image, frame int, xshift, yshift int, alpha float64, inTransition bool, inDeath bool) {
 
-	l.DrawBackground(screen, xshift, yshift, inTransition)
+	if inDeath {
+		l.DrawBackground(screen, xshift, yshift, inTransition, alpha)
+	} else {
+		l.DrawBackground(screen, xshift, yshift, inTransition, 1)
+	}
 
 	l.DrawGoal(screen, xshift, yshift, alpha)
 
-	if !inTransition {
+	if !inTransition && !inDeath {
 		l.DrawSelected(screen, alpha)
 	}
 
 	for _, line := range l.area {
 		for _, element := range line {
 			if element != nil {
-				element.Draw(screen, frame, xshift, yshift, alpha)
+				element.Draw(screen, frame, xshift, yshift, alpha, inDeath)
 			}
 		}
 	}
 
 }
 
-func (l level) DrawBackground(screen *ebiten.Image, xshift, yshift int, inTransition bool) {
+func (l level) DrawBackground(screen *ebiten.Image, xshift, yshift int, inTransition bool, alpha float64) {
 
 	for i := 0; i < len(l.area); i++ {
 		for j := 0; j < len(l.area[0]); j++ {
@@ -212,6 +216,7 @@ func (l level) DrawBackground(screen *ebiten.Image, xshift, yshift int, inTransi
 				float64(j*globAreaCellSize+globAreaPositionX+xshift),
 				float64(i*globAreaCellSize+globAreaPositionY+yshift),
 			)
+			options.ColorM.Scale(1, 1, 1, alpha)
 			screen.DrawImage(imageDesert[(i*len(l.area[0])+j+l.num)%2], &options)
 		}
 	}
@@ -313,6 +318,6 @@ func (g Game) DrawLevel(screen *ebiten.Image) {
 		xshift = rand.Intn(globShakeAmplitude)
 		yshift = rand.Intn(globShakeAmplitude)
 	}
-	g.level.Draw(screen, g.animeFrame, xshift, yshift, 1, false)
-	g.hud.Draw(screen, false)
+	g.level.Draw(screen, g.animeFrame, xshift, yshift, 1, false, false)
+	g.hud.Draw(screen, false, false, false)
 }
