@@ -37,8 +37,8 @@ func (g *Game) UpdateDead() {
 		if isAnyKeyJustPressed() {
 			g.transitionStep = 0
 			g.transitionFrame = 0
-			g.step = stepRank
-			//g.step = stepTitle
+			//g.step = stepRank
+			g.step = stepTitle
 			if g.inTuto {
 				g.step = stepTuto
 				g.subStep = tutoStepBase
@@ -50,7 +50,7 @@ func (g *Game) UpdateDead() {
 				return
 			}
 			g.subStep = 0
-			//g.Reset()
+			g.Reset()
 		}
 	}
 }

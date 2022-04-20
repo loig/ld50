@@ -22,6 +22,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -125,6 +126,7 @@ func getRank(name string, level int, c chan rank) {
 		"level": {fmt.Sprint(level)},
 	})
 	if err != nil {
+		log.Print(err)
 		c <- rank{ok: false, errnum: 1}
 		return
 	}
