@@ -54,7 +54,6 @@ func (g *Game) UpdateTuto() {
 		}
 		if hurt {
 			g.cameraShake = true
-			g.playSound(soundHurtID)
 		}
 		if hasMoved {
 			g.AddParticlesOnGrid(fromX, fromY, toX, toY)
@@ -77,6 +76,9 @@ func (g *Game) UpdateTuto() {
 			g.NextLevel(false, true)
 			g.playSound(soundVictoryID)
 			g.step = stepLevelTransition
+		}
+		if hurt && !dead {
+			g.playSound(soundHurtID)
 		}
 		if hasMoved && !hurt && !waterp && !foodp && !dead && !finished &&
 			(fromX != toX || fromY != toY) {

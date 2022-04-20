@@ -43,6 +43,7 @@ func initHud() (h hud) {
 
 func (h *hud) Reset() {
 	h.life = h.lifeMax
+	h.waterMax = 1000
 	h.water = h.waterMax
 	h.waterStep = 1
 	h.levelNum = 1

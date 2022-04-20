@@ -297,17 +297,28 @@ func (g *Game) UpdateLevel() {
 	}
 	if waterp {
 		g.AddWaterFoodParticles(toX, toY, true)
+		g.playSound(soundWaterID)
 	}
 	if foodp {
 		g.AddWaterFoodParticles(toX, toY, false)
+		g.playSound(soundFoodID)
 	}
 	dead := g.hud.Update(hurt, food, water, false)
 	if dead {
 		g.step = stepDead
+		g.playSound(soundDeathID)
 	}
 	if finished {
 		g.NextLevel(false, false)
 		g.step = stepLevelTransition
+		g.playSound(soundVictoryID)
+	}
+	if hurt && !dead {
+		g.playSound(soundHurtID)
+	}
+	if hasMoved && !hurt && !waterp && !foodp && !dead && !finished &&
+		(fromX != toX || fromY != toY) {
+		g.playSound(soundMoveID)
 	}
 }
 
