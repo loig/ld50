@@ -54,6 +54,30 @@ var imageDead *ebiten.Image
 
 var imageParticle *ebiten.Image
 
+//go:embed death.mp3
+var soundDeathBytes []byte
+var soundDeath []byte
+
+//go:embed food.mp3
+var soundFoodBytes []byte
+var soundFood []byte
+
+//go:embed hurt.mp3
+var soundHurtBytes []byte
+var soundHurt []byte
+
+//go:embed move.mp3
+var soundMoveBytes []byte
+var soundMove []byte
+
+//go:embed victory.mp3
+var soundVictoryBytes []byte
+var soundVictory []byte
+
+//go:embed water.mp3
+var soundWaterBytes []byte
+var soundWater []byte
+
 func loadAssets() {
 	var err error
 

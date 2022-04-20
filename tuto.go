@@ -54,24 +54,33 @@ func (g *Game) UpdateTuto() {
 		}
 		if hurt {
 			g.cameraShake = true
+			g.playSound(soundHurtID)
 		}
 		if hasMoved {
 			g.AddParticlesOnGrid(fromX, fromY, toX, toY)
 		}
 		if waterp {
 			g.AddWaterFoodParticles(toX, toY, true)
+			g.playSound(soundWaterID)
 		}
 		if foodp {
 			g.AddWaterFoodParticles(toX, toY, false)
+			g.playSound(soundFoodID)
 		}
 		dead := g.hud.Update(hurt, food, water, g.hud.levelNum < tutoLearnDeathLevel)
 		if dead {
 			//g.subStep = tutoStepDead
+			g.playSound(soundDeathID)
 			g.step = stepDead
 		}
 		if finished {
 			g.NextLevel(false, true)
+			g.playSound(soundVictoryID)
 			g.step = stepLevelTransition
+		}
+		if hasMoved && !hurt && !waterp && !foodp && !dead && !finished &&
+			(fromX != toX || fromY != toY) {
+			g.playSound(soundMoveID)
 		}
 		return
 	}
