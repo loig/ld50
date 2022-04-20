@@ -22,6 +22,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -33,6 +34,7 @@ type rank struct {
 	firstn, secondn, thirdn string
 	firstl, secondl, thirdl int
 	ok                      bool
+	errnum                  int
 }
 
 const (
@@ -98,6 +100,7 @@ func (g *Game) DrawRank(screen *ebiten.Image) {
 	case rankStepDisplay:
 		if !g.finalrank.ok {
 			ebitenutil.DebugPrintAt(screen, "Can't reach Server", globLevelNumPosX-5, globLevelNumPosY+25)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprint("error: ", g.finalrank.errnum), globLevelNumPosX-5, globLevelNumPosY+35)
 			return
 		}
 		ebitenutil.DebugPrintAt(screen, fmt.Sprint("You ranked ", g.finalrank.pos), globLevelNumPosX, globLevelNumPosY+25)
@@ -122,7 +125,8 @@ func getRank(name string, level int, c chan rank) {
 		"level": {fmt.Sprint(level)},
 	})
 	if err != nil {
-		c <- rank{ok: false}
+		log.Print(err)
+		c <- rank{ok: false, errnum: 1}
 		return
 	}
 
@@ -130,45 +134,45 @@ func getRank(name string, level int, c chan rank) {
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		c <- rank{ok: false}
+		c <- rank{ok: false, errnum: 2}
 		return
 	}
 
 	parts := strings.Split(string(body), ":")
 	if len(parts) != 5 {
-		c <- rank{ok: false}
+		c <- rank{ok: false, errnum: 3}
 	}
 
 	pos, err := strconv.Atoi(parts[0])
 	if err != nil {
-		c <- rank{ok: false}
+		c <- rank{ok: false, errnum: 4}
 		return
 	}
 
 	firstn := parts[1][1:4]
 	firstl, err := strconv.Atoi(parts[1][5 : len(parts[1])-1])
 	if err != nil {
-		c <- rank{ok: false}
+		c <- rank{ok: false, errnum: 5}
 		return
 	}
 
 	secondn := parts[2][1:4]
 	secondl, err := strconv.Atoi(parts[2][5 : len(parts[2])-1])
 	if err != nil {
-		c <- rank{ok: false}
+		c <- rank{ok: false, errnum: 6}
 		return
 	}
 
 	thirdn := parts[3][1:4]
 	thirdl, err := strconv.Atoi(parts[3][5 : len(parts[3])-1])
 	if err != nil {
-		c <- rank{ok: false}
+		c <- rank{ok: false, errnum: 7}
 		return
 	}
 
 	numPos, err := strconv.Atoi(parts[4])
 	if err != nil {
-		c <- rank{ok: false}
+		c <- rank{ok: false, errnum: 8}
 		return
 	}
 

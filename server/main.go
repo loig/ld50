@@ -34,6 +34,9 @@ var mut sync.Mutex
 
 func HandleRequest(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Content-Type", "text/html;charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	name := r.PostFormValue("uname")
 	level := r.PostFormValue("level")
 
@@ -75,7 +78,7 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 		newPos++
 
-		log.Print("Added a score: ", name, ",", level, ",", newPos)
+		log.Print("Added a score: ", name, ",", level, ",", newPos, " from request ", *r)
 
 		fmt.Fprint(w, newPos, ":", theScores[0], ":", theScores[1], ":", theScores[2], ":", len(theScores))
 
