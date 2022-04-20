@@ -18,9 +18,11 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -29,8 +31,49 @@ type score struct {
 	level int
 }
 
+const logfile string = "server.log"
+
 var theScores []score
 var mut sync.Mutex
+
+func insertScore(name string, nlevel int) int {
+
+	newScore := score{name: name, level: nlevel}
+
+	position := 0
+
+	mut.Lock()
+
+	for i := 0; i < len(theScores); i++ {
+		position = i
+		if newScore.level > theScores[i].level {
+			newScore, theScores[i] = theScores[i], newScore
+			break
+		}
+	}
+
+	newPos := position
+	oldScore := score{name: name, level: nlevel}
+	if newScore == oldScore {
+		newPos++
+	}
+
+	position++
+
+	for ; position < len(theScores); position++ {
+		newScore, theScores[position] = theScores[position], newScore
+	}
+
+	if newScore.level > 0 {
+		theScores = append(theScores, newScore)
+	}
+
+	mut.Unlock()
+
+	newPos++
+
+	return newPos
+}
 
 func HandleRequest(w http.ResponseWriter, r *http.Request) {
 
@@ -44,39 +87,9 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil && name != "" {
 
-		mut.Lock()
+		newPos := insertScore(name, nlevel)
 
-		newScore := score{name: name, level: nlevel}
-
-		position := 0
-
-		for i := 0; i < len(theScores); i++ {
-			position = i
-			if newScore.level > theScores[i].level {
-				newScore, theScores[i] = theScores[i], newScore
-				break
-			}
-		}
-
-		newPos := position
-		oldScore := score{name: name, level: nlevel}
-		if newScore == oldScore {
-			newPos++
-		}
-
-		position++
-
-		for ; position < len(theScores); position++ {
-			newScore, theScores[position] = theScores[position], newScore
-		}
-
-		if newScore.level > 0 {
-			theScores = append(theScores, newScore)
-		}
-
-		mut.Unlock()
-
-		newPos++
+		fmt.Print(name, ":", level, ";")
 
 		log.Print("Added a score: ", name, ",", level, ",", newPos, " from request ", *r)
 
@@ -91,7 +104,24 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+	content, err := ioutil.ReadFile(logfile)
+	if err != nil {
+		log.Print(err)
+	}
+
+	previous := strings.Split(string(content), ";")
+
 	theScores = []score{{"AAA", 0}, {"AAA", 0}, {"AAA", 0}}
+
+	for _, ascore := range previous {
+		info := strings.Split(ascore, ":")
+		if len(info) == 2 {
+			nlevel, err := strconv.Atoi(info[1])
+			if err == nil {
+				insertScore(info[0], nlevel)
+			}
+		}
+	}
 
 	http.HandleFunc("/", HandleRequest)
 

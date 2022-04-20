@@ -22,7 +22,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -96,7 +95,7 @@ func (g *Game) DrawRank(screen *ebiten.Image) {
 
 	switch g.subStep {
 	case rankStepRequest:
-		ebitenutil.DebugPrintAt(screen, "Waiting for server", globLevelNumPosX, globLevelNumPosY+20)
+		ebitenutil.DebugPrintAt(screen, "Waiting for server", globLevelNumPosX-5, globLevelNumPosY+20)
 	case rankStepDisplay:
 		if !g.finalrank.ok {
 			ebitenutil.DebugPrintAt(screen, "Can't reach Server", globLevelNumPosX-5, globLevelNumPosY+25)
@@ -111,6 +110,7 @@ func (g *Game) DrawRank(screen *ebiten.Image) {
 		ebitenutil.DebugPrintAt(screen, fmt.Sprint("3. ", g.finalrank.thirdn, " lvl ", g.finalrank.thirdl), globLevelNumPosX, globLevelNumPosY+80)
 	case rankStepFirstLetter, rankStepSecondLetter, rankStepThirdLetter:
 		ebitenutil.DebugPrintAt(screen, fmt.Sprint("Name: ", g.GetName()), globLevelNumPosX, globLevelNumPosY+25)
+		ebitenutil.DebugPrintAt(screen, "_", globLevelNumPosX+6*g.subStep+36, globLevelNumPosY+26)
 		ebitenutil.DebugPrintAt(screen, "Use arrows to", globLevelNumPosX, globLevelNumPosY+50)
 		ebitenutil.DebugPrintAt(screen, "write your name.", globLevelNumPosX, globLevelNumPosY+60)
 		ebitenutil.DebugPrintAt(screen, "Press Enter when", globLevelNumPosX, globLevelNumPosY+75)
@@ -120,12 +120,11 @@ func (g *Game) DrawRank(screen *ebiten.Image) {
 }
 
 func getRank(name string, level int, c chan rank) {
-	response, err := http.PostForm("http://localhost:8081/", url.Values{
+	response, err := http.PostForm("http://games.balotchka.fr/ld50/", url.Values{
 		"uname": {name},
 		"level": {fmt.Sprint(level)},
 	})
 	if err != nil {
-		log.Print(err)
 		c <- rank{ok: false, errnum: 1}
 		return
 	}
