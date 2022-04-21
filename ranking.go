@@ -121,7 +121,7 @@ func (g *Game) DrawRank(screen *ebiten.Image) {
 }
 
 func getRank(name string, level int, c chan rank) {
-	response, err := http.PostForm("http://games.balotchka.fr/ld50/", url.Values{
+	response, err := http.PostForm("https://games.balotchka.fr/ld50/", url.Values{
 		"uname": {name},
 		"level": {fmt.Sprint(level)},
 	})

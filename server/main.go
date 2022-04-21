@@ -78,7 +78,7 @@ func insertScore(name string, nlevel int) int {
 func HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html;charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "https://v6p9d9t4.ssl.hwcdn.net")
 
 	name := r.PostFormValue("uname")
 	level := r.PostFormValue("level")
